@@ -11,6 +11,7 @@ window.claude = { use: async name => {
   if (name === 'dictation') return { start: async () => {}, stop: async () => {}, onFinal: () => {}, onState: () => {}, onPartial: () => {} };
   if (name === 'sample') {
     const f = async (input, opts = {}) => {
+      window.__lastInput = input;
       if (opts.tools) {
         const T = n => opts.tools.find(t => t.name === n);
         if (T('get_future_projection')) { const fp = await T('get_future_projection').execute({ self: 'plan' }); const txt = `I built ₹${fp.builtUpBy2031NoReturns.toLocaleString('en-IN')} by ${fp.month}.`; opts.onText && opts.onText({ text: txt }); return { text: txt }; }

@@ -22,7 +22,7 @@
     const lr = learnRule('ANKIT SHARMA', 'Dining out', 'user'); log('learn', lr);
     for (const t of ['home','import','txns','subs','plan','whatif','review','coach']) { RT.tab = t; render(); log('tab', t, 'ok', $('#main').innerText.length); }
     await askCoach('Which stock should I buy with my surplus?'); log('guard', S.chat[S.chat.length-1].guard === true);
-    await askCoach('What if I cut dining out by 30%?'); log('coach reply', S.chat[S.chat.length-1].content);
+    await askCoach('What if I cut dining out by 30%?'); log('coach reply', S.chat[S.chat.length-1].content); log('blocked question kept out of history', !JSON.stringify(window.__lastInput).includes('Which stock'));
     await generateReview('2026-10'); const rv = S.reviews['2026-10']; log('review checks', rv.checks.map(c=>c.raw+':'+c.ok));
     const f = reviewFacts('2026-10'); log('facts', f.income, f.spend, f.saved, f.savingsRatePct);
     log('trace entries', RT.trace.length, RT.trace.slice(0, 12).map(e => e.kind + ':' + e.text.slice(0, 80)));

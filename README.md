@@ -2,7 +2,7 @@
 
 *Product Space Agentic AI Hackathon '26, problem statement 04: "Personal finance coach with a living money model".*
 
-**Live demo:** https://claude.ai/artifact/4ctbhB5aCAENGaH8LZbTPA (AI features need a Claude login) · **Demo video:** [add your video link here]
+**Try it, no login:** https://ananya2104.github.io/hisaab/ (click **Watch a recorded AI session**) · **Live AI version:** https://claude.ai/artifact/4ctbhB5aCAENGaH8LZbTPA (needs a Claude login) · **Demo video:** [add your video link here]
 
 Most budgeting apps sort transactions into categories and stop there. Hisaab keeps a *living* model of your money. It reads messy Indian bank data (statement CSVs, PDFs, bank SMS), learns from every correction you make, spots subscriptions and price hikes, plans goals with what-if scenarios, nudges you when spending drifts, and writes a monthly review. An AI agent sits on top. It decides which tools to use, takes low-risk actions on its own, and shows every step in a live trace. It educates and models scenarios. It never recommends specific securities.
 
@@ -149,7 +149,7 @@ flowchart LR
 
 **Inside Claude:** open the shared link and click **Load demo data**. AI runs through the viewer's Claude account, and data is saved privately to their account.
 
-**Public copy, no login (GitHub Pages):** https://ananya2104.github.io/hisaab/. Without a Claude login the AI is off, so this copy offers a **recorded session**: a file exported from a real run with Claude (`replay/session.json`). It replays the AI answers, letters, reviews and the full agent trace, clearly labelled as recorded. Everything that isn't AI (parsing, rules, subscriptions, what-if, projections) runs live in the browser.
+**Public copy, no login (GitHub Pages):** https://ananya2104.github.io/hisaab/. Without a Claude login the AI is off, so this copy offers a **recorded session**: a file exported from a real run with Claude (`replay/session.json`). It replays the AI answers, future-self letters, the autonomous check-up and the monthly review, clearly labelled as recorded. The live agent trace for that run is shown in the demo video. One repeated check-up from the end of the run was trimmed from the file, because it exposed a bug that has since been fixed (a blocked stock question leaked into the next prompt). Everything that isn't AI (parsing, rules, subscriptions, what-if, projections) runs live in the browser.
 
 **On your own machine:** open `index.html` in Chrome. Everything except the AI parts works offline in rules-only mode. To turn on the agent, open **Settings** and add an Anthropic API key. It is stored only in your browser and sent only to `api.anthropic.com`.
 
@@ -170,7 +170,7 @@ flowchart LR
 Hisaab was built during the hackathon on 21 November 2026, as the rules require.
 
 - **AI-generated:** the application code, sample data, tests and the first draft of this README were generated with Claude (Anthropic) under my direction.
-- **My contribution:** *[fill this in honestly before submitting: e.g. choosing problem 04 and the target user, deciding what should and shouldn't use AI, the scope and feature priorities, testing the app and reporting bugs, editing the documentation, recording the demo]*
+- **My contribution:** I chose problem 04 and the Future You idea, directed the features and reviewed each version, tested the app end to end with live AI, set up the GitHub repository and the public site, and recorded and narrated the demo video (Claude edited it: cuts, captions and zooms).
 
 ## Tech
 

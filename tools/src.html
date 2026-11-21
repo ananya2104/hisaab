@@ -780,13 +780,13 @@ async function askCoach(q, opts = {}) {
   S.chat.push({ role: 'user', content: opts.display || q, prompt: q });
   RT.tab = 'coach'; render();
   const g = guardInput(q);
-  if (g) { trace('guard', g.kind === 'securities' ? 'Blocked: request for specific securities advice. Responding with education instead.' : 'Distress detected. Responding with support and a helpline instead of finance advice.'); S.chat.push({ role: 'assistant', content: g.reply, guard: true }); Store.save(); render(); return; }
+  if (g) { S.chat[S.chat.length - 1].noHist = true; trace('guard', g.kind === 'securities' ? 'Blocked: request for specific securities advice. Responding with education instead.' : 'Distress detected. Responding with support and a helpline instead of finance advice.'); S.chat.push({ role: 'assistant', content: g.reply, guard: true }); Store.save(); render(); return; }
   if (!AI.on) { S.chat.push({ role: 'assistant', content: 'The AI coach is off in this copy. Open the Claude version, add an Anthropic API key in Settings, or load the recorded session (Import tab) to see real answers. Everything else (import, rules, subscriptions, what-if, nudges, projections) works without AI.' }); render(); return; }
   if (!S.txns.length) { S.chat.push({ role: 'assistant', content: 'Import a statement or load the demo data first, so I have real numbers to work with.' }); render(); return; }
   RT.busy = true; const live = { role: 'assistant', content: '', live: true }; S.chat.push(live); render();
   trace('plan', 'Coach received: "' + q.slice(0, 120) + '". The model will choose tools.');
   try {
-    const hist = S.chat.filter(m => !m.live && !m.guard).slice(-7).map(m => ({ role: m.role, content: m.prompt || m.content }));
+    const hist = S.chat.filter(m => !m.live && !m.guard && !m.noHist).slice(-7).map(m => ({ role: m.role, content: m.prompt || m.content }));
     if (hist.length && hist[hist.length - 1].role === 'user') hist[hist.length - 1] = { role: 'user', content: agentBrief() + '\n\nUSER: ' + hist[hist.length - 1].content };
     while (hist.length && hist[0].role !== 'user') hist.shift();
     let text = await AI.agent(hist, toolDefs(), t => { live.content = t; const el = $('#liveMsg'); if (el) el.textContent = t || 'Thinking…'; });
@@ -972,7 +972,7 @@ async function askFuture(q) {
   const who = RT.futureSelf || 'plan'; S.futureChat = S.futureChat || [];
   S.futureChat.push({ role: 'user', content: q, self: who }); render();
   const g = guardInput(q);
-  if (g) { trace('guard', 'Future-self chat: guardrail applied (' + g.kind + ').'); S.futureChat.push({ role: 'assistant', content: g.reply, self: who, guard: true }); Store.save(); render(); return; }
+  if (g) { const lastU = S.futureChat[S.futureChat.length - 1]; if (lastU && lastU.role === 'user') lastU.noHist = true; trace('guard', 'Future-self chat: guardrail applied (' + g.kind + ').'); S.futureChat.push({ role: 'assistant', content: g.reply, self: who, guard: true }); Store.save(); render(); return; }
   if (!AI.on) { S.futureChat.push({ role: 'assistant', content: 'Turn AI on (open in Claude or add a key in Settings) to talk to your future self.', self: who }); render(); return; }
   RT.busy = true; const live = { role: 'assistant', content: '', self: who, live: true }; S.futureChat.push(live); render();
   const f = futureFacts(); const nm = f.name === 'you' ? 'the user' : f.name;
@@ -984,7 +984,7 @@ async function askFuture(q) {
   const brief = `You are ${nm} speaking from ${f.month}, aged ${f.ageThen}: the "${who}" future self. ${who === 'drift' ? 'Your habits drifted the way get_future_projection("drift") describes.' : 'You stuck with the plan that get_future_projection("plan") describes.'}
 Talk to your younger self (aged ${f.ageNow}) in first person, warmly and honestly. Never shame or frighten. Call get_future_projection first; use only numbers from tools, as ₹ with Indian digit grouping. If they ask "what if", call simulate_what_if and explain how it would change your story. Assume no investment returns and never name stocks, funds or crypto. 3 to 5 sentences.`;
   try {
-    const hist = S.futureChat.filter(m => !m.live && !m.guard && m.self === who).slice(-6).map(m => ({ role: m.role, content: m.content }));
+    const hist = S.futureChat.filter(m => !m.live && !m.guard && !m.noHist && m.self === who).slice(-6).map(m => ({ role: m.role, content: m.content }));
     hist[hist.length - 1] = { role: 'user', content: brief + '\n\nYOUNGER SELF ASKS: ' + hist[hist.length - 1].content };
     while (hist.length && hist[0].role !== 'user') hist.shift();
     const text = await AI.agent(hist, base.concat([tool]), t => { live.content = t; const el = $('#futLive'); if (el) el.textContent = t || 'Thinking…'; });
@@ -1057,7 +1057,7 @@ function loadReplay() {
   RT.ver++; Store.save(); renderTrace(); RT.tab = 'home'; render();
   toast('Recorded session loaded');
 }
-const replayBanner = () => RT.replay ? `<div class="card" style="background:var(--infoSoft);border-color:#c7d7fe"><b>Recorded session.</b> The AI answers, letters, reviews and agent trace here come from a real run with Claude on ${fmtDate(RT.replay.at.slice(0, 10))}. Everything else (rules, subscriptions, what-if, projections) runs live in your browser. To run the AI yourself, add an Anthropic API key in Settings.</div>` : '';
+const replayBanner = () => RT.replay ? `<div class="card" style="background:var(--infoSoft);border-color:#c7d7fe"><b>Recorded session.</b> The AI answers, future-self letters, check-up and monthly review here come from a real run with Claude on ${fmtDate(RT.replay.at.slice(0, 10))}; the demo video shows that run's live agent trace. Everything else (rules, subscriptions, what-if, projections) runs live in your browser. To run the AI yourself, add an Anthropic API key in Settings.</div>` : '';
 
 /* ============================================================
    RENDERING
@@ -1120,7 +1120,7 @@ function vImport() {
   <div class="card"><h2>Any statement text</h2><textarea id="txtIn" placeholder="Paste rows copied from a PDF or net-banking page."></textarea><div class="row" style="margin-top:8px"><button class="btn" data-act="importText" ${RT.busy ? 'disabled' : ''}>Read text</button></div></div>
   <div class="card"><h2>Demo account</h2><p class="small">Priya, 27, Bengaluru: an HDFC savings-account CSV for Aug–Oct 2026 plus bank SMS for 1–20 November.</p><div class="row"><button class="btn p" data-act="demo" ${RT.busy ? 'disabled' : ''}>Load demo data</button><button class="btn" data-act="reset">Reset all data</button></div></div>
   ${S.txns.length ? `<div class="card"><h2>Save this session</h2><p class="small">Download everything (data, AI answers, letters, reviews and the agent trace) as one file. Anyone can replay it in the public copy of Hisaab without a Claude login.</p><button class="btn" data-act="exportSession">Download session file</button></div>` : ''}
-  ${RT.replayData ? `<div class="card"><h2>Recorded AI session</h2><p class="small">Replay a real run of Hisaab with Claude, including the agent trace.</p><button class="btn p" data-act="replay">Load recorded session</button></div>` : ''}
+  ${RT.replayData ? `<div class="card"><h2>Recorded AI session</h2><p class="small">Replay a real run of Hisaab with Claude: letters, coach answers, the autonomous check-up and the monthly review.</p><button class="btn p" data-act="replay">Load recorded session</button></div>` : ''}
   ${S.log.length ? `<div class="card"><h2>Import history</h2><table><tr><th>When</th><th>What</th><th class="n">Added</th></tr>${S.log.slice().reverse().map(l => `<tr><td>${new Date(l.at).toLocaleString('en-IN')}</td><td>${esc(l.label)}</td><td class="n">${l.added}</td></tr>`).join('')}</table></div>` : ''}`;
 }
 function vTxns(M) {
