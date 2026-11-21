@@ -203,7 +203,7 @@ const freshState = () => ({
 });
 let S = freshState();
 const RT = { tab: 'home', trace: [], busy: false, filter: { month: 'all', cat: 'all', q: '', review: false }, pending: null,
-  whatif: { cuts: { 'Food delivery': 0, 'Dining out': 0, 'Shopping': 0 }, rentDelta: 0, incomePct: 0, cancel: {} }, lastAgentScenario: null, reviewMonth: null, ver: 0, futureSelf: 'plan', tts: null, dict: null, listening: false, autoVoice: false };
+  whatif: { cuts: { 'Food delivery': 0, 'Dining out': 0, 'Shopping': 0 }, rentDelta: 0, incomePct: 0, cancel: {} }, lastAgentScenario: null, reviewMonth: null, ver: 0, replay: null, replayData: null, downloads: null, futureSelf: 'plan', tts: null, dict: null, listening: false, autoVoice: false };
 
 /* ---------- storage: Claude per-user db → localStorage → memory ---------- */
 const Store = {
@@ -780,7 +780,7 @@ async function askCoach(q, opts = {}) {
   RT.tab = 'coach'; render();
   const g = guardInput(q);
   if (g) { trace('guard', g.kind === 'securities' ? 'Blocked: request for specific securities advice. Responding with education instead.' : 'Distress detected. Responding with support and a helpline instead of finance advice.'); S.chat.push({ role: 'assistant', content: g.reply, guard: true }); Store.save(); render(); return; }
-  if (!AI.on) { S.chat.push({ role: 'assistant', content: 'The AI coach is off here. Open this app inside Claude, or add an Anthropic API key in Settings. Everything else (import, rules, subscriptions, what-if, nudges) still works without AI.' }); render(); return; }
+  if (!AI.on) { S.chat.push({ role: 'assistant', content: 'The AI coach is off in this copy. Open the Claude version, add an Anthropic API key in Settings, or load the recorded session (Import tab) to see real answers. Everything else (import, rules, subscriptions, what-if, nudges, projections) works without AI.' }); render(); return; }
   if (!S.txns.length) { S.chat.push({ role: 'assistant', content: 'Import a statement or load the demo data first, so I have real numbers to work with.' }); render(); return; }
   RT.busy = true; const live = { role: 'assistant', content: '', live: true }; S.chat.push(live); render();
   trace('plan', 'Coach received: "' + q.slice(0, 120) + '". The model will choose tools.');
@@ -1042,6 +1042,22 @@ function letterHTML(kind) {
   return `<div style="margin-top:12px;padding:12px;border-radius:8px;background:${kind === 'plan' ? '#f3faf8' : '#fffaf0'}"><div class="row small" style="justify-content:space-between"><b>A letter from ${kind} you</b>${RT.tts ? `<button class="btn s" data-act="speakOne" data-v="${kind}">Play</button>` : ''}</div><div class="review" style="margin-top:6px">${h}</div><div class="small" style="margin-top:6px;color:${bad ? 'var(--warn)' : 'var(--good)'}">${bad ? bad + ' figure(s) not found in the projection' : 'All ' + ch.length + ' figures match the projection'}</div></div>`;
 }
 
+/* ---------- recorded sessions: let judges without a Claude login see a real AI run ---------- */
+async function exportSession() {
+  const data = JSON.stringify({ kind: 'hisaab-session', recordedAt: new Date().toISOString(), aiMode: AI.mode, state: S, trace: RT.trace });
+  if (RT.downloads) { try { await RT.downloads.save({ filename: 'hisaab-session.json', data }); toast('Session file saved'); return; } catch (e) { if (e && e.code === 'declined') return; } }
+  if (!window.claude) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = 'hisaab-session.json'; a.click(); return; } catch {} }
+  $('#modalBox').innerHTML = `<h2>Session file</h2><p class="small">Copy everything below and save it as <b>hisaab-session.json</b>.</p><textarea style="min-height:240px">${esc(data)}</textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-act="closeModal">Close</button></div>`;
+  $('#modal').classList.add('show');
+}
+function loadReplay() {
+  const d = RT.replayData; if (!d) return;
+  S = Object.assign(freshState(), d.state); RT.trace = d.trace || []; RT.replay = { at: d.recordedAt };
+  RT.ver++; Store.save(); renderTrace(); RT.tab = 'home'; render();
+  toast('Recorded session loaded');
+}
+const replayBanner = () => RT.replay ? `<div class="card" style="background:var(--infoSoft);border-color:#c7d7fe"><b>Recorded session.</b> The AI answers, letters, reviews and agent trace here come from a real run with Claude on ${fmtDate(RT.replay.at.slice(0, 10))}. Everything else (rules, subscriptions, what-if, projections) runs live in your browser. To run the AI yourself, add an Anthropic API key in Settings.</div>` : '';
+
 /* ============================================================
    RENDERING
    ============================================================ */
@@ -1058,11 +1074,11 @@ function render() {
   const reviewN = S.txns.filter(t => t.needsReview).length;
   $('#nav').innerHTML = TABS.map(([id, l], i) => `<button class="${RT.tab === id ? 'active' : ''}" data-tab="${id}"><span class="num">${i + 1}</span>${l}${id === 'txns' && reviewN ? `<span class="badge">${reviewN}</span>` : ''}${id === 'home' && M.nudges.length ? `<span class="badge">${M.nudges.length}</span>` : ''}</button>`).join('');
   const views = { home: vHome, future: vFuture, import: vImport, txns: vTxns, subs: vSubs, plan: vPlan, whatif: vWhatIf, review: vReview, coach: vCoach };
-  $('#main').innerHTML = views[RT.tab](M);
+  $('#main').innerHTML = replayBanner() + views[RT.tab](M);
   renderChips();
   const cb = $('#chatBox'); if (cb) cb.scrollTop = cb.scrollHeight;
 }
-const emptyState = () => `<div class="card empty"><h2>No data yet</h2><p>Import a bank statement or bank SMS, or load the demo account to see the agent at work.</p><div class="row" style="justify-content:center"><button class="btn p" data-act="demo">Load demo data (3 months + November SMS)</button><button class="btn" data-tab="import">Import my own</button></div></div>`;
+const emptyState = () => `<div class="card empty"><h2>No data yet</h2><p>Import a bank statement or bank SMS, or load the demo account to see the agent at work.</p><div class="row" style="justify-content:center">${RT.replayData ? '<button class="btn p" data-act="replay">Watch a recorded AI session</button>' : ''}<button class="btn ${RT.replayData ? '' : 'p'}" data-act="demo">Load demo data (3 months + November SMS)</button><button class="btn" data-tab="import">Import my own</button></div>${RT.replayData ? '<p class="small muted" style="margin-top:10px">No Claude login here, so the AI is off. The recorded session shows the real AI results from a full run.</p>' : ''}</div>`;
 function kpi(l, v, s) { return `<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s || ''}</div></div>`; }
 function nudgeHTML(n) { const lbl = { warn: 'Watch', bad: 'Act', info: 'FYI', good: 'Nice' }[n.level] || 'FYI'; return `<div class="nudge ${n.level}"><span class="ic">${lbl}</span><div>${esc(n.text)}${n.agent ? ' <span class="pill i">by agent</span>' : ''}</div><button class="btn s ghost x" data-act="dismiss" data-id="${esc(n.id)}" title="Dismiss">✕</button></div>`; }
 function vHome(M) {
@@ -1102,6 +1118,8 @@ function vImport() {
   </div>
   <div class="card"><h2>Any statement text</h2><textarea id="txtIn" placeholder="Paste rows copied from a PDF or net-banking page."></textarea><div class="row" style="margin-top:8px"><button class="btn" data-act="importText" ${RT.busy ? 'disabled' : ''}>Read text</button></div></div>
   <div class="card"><h2>Demo account</h2><p class="small">Priya, 27, Bengaluru: an HDFC savings-account CSV for Aug–Oct 2026 plus bank SMS for 1–20 November.</p><div class="row"><button class="btn p" data-act="demo" ${RT.busy ? 'disabled' : ''}>Load demo data</button><button class="btn" data-act="reset">Reset all data</button></div></div>
+  ${S.txns.length ? `<div class="card"><h2>Save this session</h2><p class="small">Download everything (data, AI answers, letters, reviews and the agent trace) as one file. Anyone can replay it in the public copy of Hisaab without a Claude login.</p><button class="btn" data-act="exportSession">Download session file</button></div>` : ''}
+  ${RT.replayData ? `<div class="card"><h2>Recorded AI session</h2><p class="small">Replay a real run of Hisaab with Claude, including the agent trace.</p><button class="btn p" data-act="replay">Load recorded session</button></div>` : ''}
   ${S.log.length ? `<div class="card"><h2>Import history</h2><table><tr><th>When</th><th>What</th><th class="n">Added</th></tr>${S.log.slice().reverse().map(l => `<tr><td>${new Date(l.at).toLocaleString('en-IN')}</td><td>${esc(l.label)}</td><td class="n">${l.added}</td></tr>`).join('')}</table></div>` : ''}`;
 }
 function vTxns(M) {
@@ -1250,6 +1268,8 @@ document.addEventListener('click', async e => {
   else if (act === 'wiAsk') { const q = $('#wiAsk').value.trim(); if (q) askCoach(q); }
   else if (act === 'genReview') generateReview(RT.reviewMonth || model().full[model().full.length - 1] || model().latest);
   else if (act === 'copyReview') { try { await navigator.clipboard.writeText(S.reviews[a.dataset.k].text); toast('Copied'); } catch { toast('Copy blocked: select the text instead'); } }
+  else if (act === 'exportSession') exportSession();
+  else if (act === 'replay') loadReplay();
   else if (act === 'letters') writeLetters();
   else if (act === 'speakBoth') speakFuture('both');
   else if (act === 'speakOne') speakFuture(a.dataset.v);
@@ -1314,11 +1334,15 @@ $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#mo
   await Store.init(); RT.ver++; render(); renderChips();
   AI.init();
   if (window.claude && typeof window.claude.use === 'function') {
+    withTimeout(window.claude.use('downloads'), 10000).then(d => { if (d) RT.downloads = d; }).catch(() => {});
     withTimeout(window.claude.use('tts'), 10000).then(t => { if (t) { RT.tts = t; render(); } }).catch(() => {});
     withTimeout(window.claude.use('dictation'), 10000).then(d => { if (!d) return; RT.dict = d;
       d.onFinal(({ text }) => { const el = $('#fuIn'); if (el) el.value = (el.value + ' ' + text).trim(); });
       d.onState(({ state }) => { RT.listening = state === 'listening'; const b = $('#micBtn'); if (b) b.textContent = RT.listening ? 'Stop' : 'Speak'; });
       render(); }).catch(() => {});
+  }
+  if (!window.claude && /^https?:/.test(location.protocol)) {
+    fetch('replay/session.json').then(r => r.ok ? r.json() : null).then(d => { if (d && d.kind === 'hisaab-session') { RT.replayData = d; render(); } }).catch(() => {});
   }
   if (S.txns.length) trace('info', `Loaded your saved money model: ${S.txns.length} transactions, ${S.rules.length} learned rule(s).`);
 })();

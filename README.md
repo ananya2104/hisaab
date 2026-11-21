@@ -149,6 +149,8 @@ flowchart LR
 
 **Inside Claude:** open the shared link and click **Load demo data**. AI runs through the viewer's Claude account, and data is saved privately to their account.
 
+**Public copy, no login (GitHub Pages):** https://ananya2104.github.io/hisaab/. Without a Claude login the AI is off, so this copy offers a **recorded session**: a file exported from a real run with Claude (`replay/session.json`). It replays the AI answers, letters, reviews and the full agent trace, clearly labelled as recorded. Everything that isn't AI (parsing, rules, subscriptions, what-if, projections) runs live in the browser.
+
 **On your own machine:** open `index.html` in Chrome. Everything except the AI parts works offline in rules-only mode. To turn on the agent, open **Settings** and add an Anthropic API key. It is stored only in your browser and sent only to `api.anthropic.com`.
 
 **Tests:** `bash tests/run_headless.sh` runs an end-to-end scenario in headless Chrome with a fake Claude runtime. It imports both demo files, checks categories, recurring payments, nudges, goals, what-if, rule learning, the guardrail, the agent's tool calls, the review number check, Future You projections, letter figure checks, the future-self chat and saving.
