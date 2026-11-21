@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hisaab: an agentic personal finance coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --ink:#18202b; --ink2:#4a5566; --ink3:#7b8696; --line:#e3e7ee;
+  --brand:#0f5b52; --brand2:#127a6d; --brandSoft:#e3f2ef; --warn:#b45309; --warnSoft:#fff4e5;
+  --bad:#b42318; --badSoft:#fdecea; --good:#067647; --goodSoft:#e6f6ee; --info:#1d4ed8; --infoSoft:#e8efff;
+  --radius:10px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:#0c2b28;color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .logo{font-weight:700;font-size:17px;letter-spacing:.2px}
+header .logo span{color:#7fe0cf}
+header .tag{color:#b9d6d1;font-size:12.5px}
+header .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;white-space:nowrap}
+.chip.dark{background:rgba(255,255,255,.1);color:#dff3ef}
+.dot{width:7px;height:7px;border-radius:50%;background:#999;display:inline-block}
+.dot.on{background:#3ddc97}.dot.off{background:#f97066}.dot.wait{background:#fdb022}
+.layout{display:grid;grid-template-columns:200px minmax(0,1fr) 340px;gap:0;min-height:calc(100vh - 52px)}
+nav{background:#fff;border-right:1px solid var(--line);padding:12px 8px}
+nav button{display:flex;width:100%;align-items:center;gap:8px;border:0;background:none;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink2);font-weight:500;text-align:left}
+nav button:hover{background:#f1f4f7}
+nav button.active{background:var(--brandSoft);color:var(--brand)}
+nav .num{width:20px;height:20px;border-radius:6px;background:#eef1f5;color:var(--ink3);font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+nav button.active .num{background:var(--brand);color:#fff}
+nav .badge{margin-left:auto;background:var(--warn);color:#fff;border-radius:999px;font-size:11px;padding:0 7px}
+main{padding:18px 22px 60px;min-width:0}
+aside{background:#0f1720;color:#d5dde7;border-left:1px solid #1f2a36;display:flex;flex-direction:column;max-height:calc(100vh - 52px);position:sticky;top:0}
+aside .ah{padding:12px 14px;border-bottom:1px solid #1f2a36;display:flex;align-items:center;gap:8px}
+aside .ah b{color:#fff}
+aside .ah small{color:#8b98a8;white-space:nowrap}
+aside .tl{overflow:auto;padding:8px 10px;flex:1;font-size:12.3px}
+.tr{border-left:2px solid #2b3846;padding:4px 0 8px 10px;margin-left:4px;position:relative}
+.tr .k{font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:1px 6px;border-radius:4px;margin-right:6px}
+.tr.plan .k{background:#1e3a5f;color:#9cc4ff}.tr.tool .k{background:#3b2f12;color:#ffd27a}.tr.result .k{background:#173b2f;color:#7fe0b4}
+.tr.guard .k{background:#4a1d1d;color:#ffb3ad}.tr.action .k{background:#2c2357;color:#c6b8ff}.tr.final .k{background:#20323a;color:#bfe9ff}
+.tr.info .k{background:#26303c;color:#c3cdd9}.tr.error .k{background:#5b1a1a;color:#ffc9c4}
+.tr .t{color:#7d8a9b;font-size:10.5px;float:right}
+.tr pre{margin:4px 0 0;white-space:pre-wrap;word-break:break-word;color:#aeb9c7;font:11.3px/1.4 ui-monospace,Menlo,Consolas,monospace;background:#151f2a;padding:6px 7px;border-radius:6px;max-height:160px;overflow:auto}
+h1{font-size:21px;margin:2px 0 4px}
+h2{font-size:16px;margin:0 0 10px}
+h3{font-size:14px;margin:0 0 8px}
+.sub{color:var(--ink3);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi .l{color:var(--ink3);font-size:12px;font-weight:500}
+.kpi .v{font-size:21px;font-weight:700;margin-top:2px}
+.kpi .s{font-size:12px;color:var(--ink3)}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:500}
+.btn:hover{background:#f6f8fa}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.p:hover{background:var(--brand2)}
+.btn.s{padding:4px 9px;font-size:12.5px}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--ink3)}
+.small{font-size:12.5px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--ink3);font-weight:600;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.flag td{background:#fffaf0}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600}
+.pill.g{background:var(--goodSoft);color:var(--good)}.pill.w{background:var(--warnSoft);color:var(--warn)}.pill.b{background:var(--badSoft);color:var(--bad)}.pill.i{background:var(--infoSoft);color:var(--info)}.pill.n{background:#eef1f5;color:var(--ink2)}
+.nudge{display:flex;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;align-items:flex-start}
+.nudge.warn{background:var(--warnSoft)}.nudge.bad{background:var(--badSoft)}.nudge.info{background:var(--infoSoft)}.nudge.good{background:var(--goodSoft)}
+.nudge .ic{font-weight:700;font-size:12px;border-radius:6px;padding:1px 7px;color:#fff;margin-top:2px;white-space:nowrap}
+.nudge.warn .ic{background:var(--warn)}.nudge.bad .ic{background:var(--bad)}.nudge.info .ic{background:var(--info)}.nudge.good .ic{background:var(--good)}
+.nudge .x{margin-left:auto}
+input[type=text],input[type=number],input[type=date],select,textarea{border:1px solid #d0d6df;border-radius:8px;padding:7px 9px;background:#fff;width:100%}
+textarea{min-height:120px;resize:vertical;font:12.5px/1.45 ui-monospace,Menlo,Consolas,monospace}
+select.cat{padding:3px 6px;font-size:12.5px;width:auto;max-width:170px}
+label.f{display:block;font-size:12px;color:var(--ink3);font-weight:600;margin-bottom:4px}
+.drop{border:2px dashed #c9d2dd;border-radius:10px;padding:20px;text-align:center;color:var(--ink3);background:#fafbfc}
+.drop.over{border-color:var(--brand);background:var(--brandSoft)}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:56vh;overflow:auto;padding:4px}
+.msg{max-width:86%;padding:10px 13px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
+.msg.u{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.msg.a{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.a.guard{border-color:#f2b8b5;background:#fff8f7}
+.sugg{display:flex;flex-wrap:wrap;gap:6px}
+.sugg button{border:1px solid #cfe3df;background:#f3faf8;color:var(--brand);border-radius:999px;padding:4px 11px;cursor:pointer;font-size:12.5px}
+.bar{height:9px;background:#eef1f5;border-radius:6px;position:relative;overflow:visible}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--brand2)}
+.bar i.w{background:#f79009}.bar i.b{background:#f04438}
+.bar .pace{position:absolute;top:-3px;width:2px;height:15px;background:#344054}
+.slider{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:8px 0}
+input[type=range]{width:100%;accent-color:var(--brand)}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#101828;color:#fff;padding:9px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90vw}
+#toast.show{opacity:1}
+#modal{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;z-index:40}
+#modal.show{display:flex}
+#modal .box{background:#fff;border-radius:12px;padding:18px;max-width:520px;width:92vw;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.review{white-space:pre-wrap;line-height:1.6}
+.verify{padding:8px 12px;border-radius:8px;font-size:12.5px;margin-top:10px}
+.verify.ok{background:var(--goodSoft);color:var(--good)}.verify.bad{background:var(--warnSoft);color:var(--warn)}
+.empty{text-align:center;padding:30px 10px;color:var(--ink3)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid #cfd6df;border-top-color:var(--brand);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+mark.unv{background:#fde68a;border-radius:3px;padding:0 2px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--ink3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+@media (max-width:1180px){.layout{grid-template-columns:180px minmax(0,1fr)} aside{grid-column:1/-1;max-height:none;position:static}}
+@media (max-width:760px){.layout{grid-template-columns:1fr} nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line)} nav button{width:auto;white-space:nowrap} .g2,.g3,.g4{grid-template-columns:1fr} .slider{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Hisaab<span>.</span></div>
+  <div class="tag">an agentic finance coach with a living money model</div>
+  <div class="spacer"></div>
+  <span class="chip dark" id="aiChip"><span class="dot wait"></span>AI: checking</span>
+  <span class="chip dark" id="storeChip"><span class="dot wait"></span>Storage: checking</span>
+  <button class="btn s" id="settingsBtn" style="background:transparent;color:#dff3ef;border-color:#2c5a54">Settings</button>
+</header>
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+  <aside>
+    <div class="ah"><b>Agent trace</b><small>live: plans, tool calls, actions</small><span style="flex:1"></span><button class="btn s ghost" style="color:#8b98a8" id="clearTrace">Clear</button></div>
+    <div class="tl" id="trace"></div>
+  </aside>
+</div>
+<div id="modal"><div class="box" id="modalBox"></div></div>
+<div id="toast"></div>
+<script>
+"use strict";
+/* ============================================================
+   Hisaab: agentic personal finance coach (single-file app)
+   ============================================================ */
+const SAMPLE_CSV = "HDFC BANK Ltd.\n\"Statement of account\"\n\"Account No :XXXXXXXX1234   Priya S, Koramangala, Bengaluru\"\n\"Statement From : 01/08/2026  To : 31/10/2026\"\n\nDate,Narration,Chq./Ref.No.,Value Dt,Withdrawal Amt.,Deposit Amt.,Closing Balance\n01/08/26,NEFT CR-CITI0000001-ACME TECHNOLOGIES PVT LTD-SALARY AUG26-CITIN2026080193810,0000838328947,01/08/26,,\"85,000.00\",\"225,000.00\"\n02/08/26,UPI-CULTFIT-cultfit.payu@hdfcbank-HDFC0000499-600478163327-CULTPASS ELITE,0000105953697,02/08/26,\"1,599.00\",,\"223,401.00\"\n03/08/26,UPI-RAMESH KUMAR-rameshk@okhdfcbank-HDFC0001234-637544673531-PAYMENT FROM PHONE,0000906341966,03/08/26,\"22,000.00\",,\"201,401.00\"\n03/08/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-641025702129-ORDER,0000926830795,03/08/26,520.00,,\"200,881.00\"\n03/08/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-633738332710-ORDER,0000214447237,03/08/26,312.00,,\"200,569.00\"\n04/08/26,UPI-NAMMA METRO-bmrcl@sbi-SBIN0000813-608717912686-CARD RECHARGE,0000935822550,04/08/26,500.00,,\"200,069.00\"\n04/08/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-683081657201-ORDER,0000556497252,04/08/26,455.00,,\"199,614.00\"\n04/08/26,UPI-MTR RESTAURANT-mtr1924@okaxis-ICIC0000001-657095148296-PAYMENT,0000334978881,04/08/26,420.00,,\"199,194.00\"\n05/08/26,ACH D- ICCL-MF SIP-HDFC00000012345678,0000288856883,05/08/26,\"5,000.00\",,\"194,194.00\"\n05/08/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-666612908200-RIDE,0000963406382,05/08/26,118.00,,\"194,076.00\"\n06/08/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-653525000050-ORDER,0000847229579,06/08/26,535.00,,\"193,541.00\"\n07/08/26,POS 512345XXXXXX5678 NETFLIX.COM,0000656152900,07/08/26,649.00,,\"192,892.00\"\n07/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-614330564473-ORDER,0000598806645,07/08/26,312.00,,\"192,580.00\"\n09/08/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-687846728339-ORDER,0000153921577,09/08/26,520.00,,\"192,060.00\"\n09/08/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-630664478749-RIDE,0000698509918,09/08/26,342.00,,\"191,718.00\"\n10/08/26,BIL/BPAY/356787/BESCOM ELECTRICITY,0000367574609,10/08/26,\"1,180.00\",,\"190,538.00\"\n11/08/26,NWD-512345XXXXXX5678-ATM KORAMANGALA 5TH BLOCK,0000230307805,11/08/26,\"2,000.00\",,\"188,538.00\"\n12/08/26,POS 512345XXXXXX5678 SPOTIFY INDIA,0000590122159,12/08/26,119.00,,\"188,419.00\"\n12/08/26,UPI-ZEPTO-zeptonow@ybl-HDFC0000001-691094139054-ORDER,0000243171768,12/08/26,535.00,,\"187,884.00\"\n13/08/26,UPI-OLA-olacabs@ybl-UTIB0000001-609739872926-RIDE,0000960514523,13/08/26,156.00,,\"187,728.00\"\n13/08/26,UPI-SRI LAKSHMI TIFFINS-srilakshmitiffins@okicici-ICIC0000001-670729735682-PAYMENT,0000598906879,13/08/26,650.00,,\"187,078.00\"\n15/08/26,UPI-AMAZON PRIME VIDEO-amazonprime@apl-UTIB0000100-699383558633-PRIME MONTHLY,0000816806128,15/08/26,299.00,,\"186,779.00\"\n15/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-636890615212-ORDER,0000670298515,15/08/26,248.00,,\"186,531.00\"\n16/08/26,UPI-JIOHOTSTAR-jiohotstar@icici-ICIC0000104-690634526631-SUBSCRIPTION,0000700141462,16/08/26,299.00,,\"186,232.00\"\n16/08/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-689827297893-RIDE,0000739362057,16/08/26,236.00,,\"185,996.00\"\n16/08/26,UPI-APOLLO PHARMACY-apollopharmacy@icici-ICIC0000221-647901079933-MEDICINES,0000440696084,16/08/26,385.00,,\"185,611.00\"\n17/08/26,UPI-MYNTRA-myntra@icici-UTIB0000002-616804608623-ORDER,0000910943524,17/08/26,\"3,499.00\",,\"182,112.00\"\n18/08/26,UPI-ACT FIBERNET-actfibernet@axisbank-UTIB0000034-610932266036-BROADBAND,0000575209597,18/08/26,\"1,050.00\",,\"181,062.00\"\n18/08/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-699912714428-RIDE,0000757830420,18/08/26,289.00,,\"180,773.00\"\n20/08/26,BIL/BPAY/719176/AIRTEL POSTPAID,0000975106572,20/08/26,599.00,,\"180,174.00\"\n21/08/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-673749478913-ORDER,0000872314530,21/08/26,\"1,120.00\",,\"179,054.00\"\n22/08/26,UPI-TOIT BREWPUB-toitbrew@ybl-ICIC0000001-676814581501-PAYMENT,0000642001424,22/08/26,650.00,,\"178,404.00\"\n22/08/26,UPI-BOOKMYSHOW-bookmyshow@icici-ICIC0000071-631781267043-MOVIE,0000558209399,22/08/26,640.00,,\"177,764.00\"\n23/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-697280512905-ORDER,0000991816852,23/08/26,589.00,,\"177,175.00\"\n23/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-644764787985-ORDER,0000688273030,23/08/26,455.00,,\"176,720.00\"\n23/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-604593704402-ORDER,0000578796089,23/08/26,410.00,,\"176,310.00\"\n23/08/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-632456852025-ORDER,0000270894498,23/08/26,\"1,120.00\",,\"175,190.00\"\n24/08/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-674987658854-ORDER,0000898493949,24/08/26,312.00,,\"174,878.00\"\n25/08/26,UPI-DMART AVENUE-dmart@ybl-YESB0000001-631003814027-GROCERY,0000609677794,25/08/26,\"2,890.00\",,\"171,988.00\"\n25/08/26,IMPS-672681300933-ANKIT SHARMA-SBIN0001234-SPLIT DINNER,0000583258726,25/08/26,850.00,,\"171,138.00\"\n26/08/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-658757219412-RIDE,0000378304807,26/08/26,289.00,,\"170,849.00\"\n27/08/26,UPI-ZEPTO-zeptonow@ybl-HDFC0000001-630305022733-ORDER,0000907214179,27/08/26,\"1,385.00\",,\"169,464.00\"\n27/08/26,UPI-FLIPKART-flipkart@axisbank-UTIB0000002-671463743911-ORDER,0000365471644,27/08/26,\"2,499.00\",,\"166,965.00\"\n28/08/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-617650808629-RIDE,0000784683755,28/08/26,342.00,,\"166,623.00\"\n28/08/26,UPI-MEGHANA FOODS-meghanafoods@ybl-ICIC0000001-604047709743-PAYMENT,0000397760792,28/08/26,\"2,350.00\",,\"164,273.00\"\n29/08/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-646033091279-RIDE,0000922286180,29/08/26,156.00,,\"164,117.00\"\n29/08/26,UPI-OLA-olacabs@ybl-UTIB0000001-654045862384-RIDE,0000935021998,29/08/26,198.00,,\"163,919.00\"\n30/08/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-688835160792-ORDER,0000659741412,30/08/26,286.00,,\"163,633.00\"\n31/08/26,UPI-AMAZON PAY-amazon@apl-UTIB0000002-637450743307-ORDER,0000620332086,31/08/26,\"2,499.00\",,\"161,134.00\"\n01/09/26,NEFT CR-CITI0000001-ACME TECHNOLOGIES PVT LTD-SALARY SEP26-CITIN2026090188504,0000772966010,01/09/26,,\"85,000.00\",\"246,134.00\"\n02/09/26,UPI-CULTFIT-cultfit.payu@hdfcbank-HDFC0000499-665816749115-CULTPASS ELITE,0000356888294,02/09/26,\"1,599.00\",,\"244,535.00\"\n03/09/26,UPI-RAMESH KUMAR-rameshk@okhdfcbank-HDFC0001234-612968553858-PAYMENT FROM PHONE,0000394846763,03/09/26,\"22,000.00\",,\"222,535.00\"\n03/09/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-633709891493-ORDER,0000572309605,03/09/26,412.00,,\"222,123.00\"\n03/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-625131324880-RIDE,0000183197117,03/09/26,118.00,,\"222,005.00\"\n03/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-652549800598-RIDE,0000866162966,03/09/26,118.00,,\"221,887.00\"\n03/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-691994870499-RIDE,0000406798268,03/09/26,289.00,,\"221,598.00\"\n04/09/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-690610627883-ORDER,0000351785565,04/09/26,589.00,,\"221,009.00\"\n05/09/26,ACH D- ICCL-MF SIP-HDFC00000012345678,0000391751878,05/09/26,\"5,000.00\",,\"216,009.00\"\n05/09/26,UPI-OLA-olacabs@ybl-UTIB0000001-639470310796-RIDE,0000460613550,05/09/26,156.00,,\"215,853.00\"\n06/09/26,UPI-NAMMA METRO-bmrcl@sbi-SBIN0000813-620469103028-CARD RECHARGE,0000443285529,06/09/26,500.00,,\"215,353.00\"\n06/09/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-601627677155-RIDE,0000679984033,06/09/26,236.00,,\"215,117.00\"\n07/09/26,POS 512345XXXXXX5678 NETFLIX.COM,0000186519602,07/09/26,649.00,,\"214,468.00\"\n07/09/26,UPI-MEGHANA FOODS-meghanafoods@ybl-ICIC0000001-636532496588-PAYMENT,0000248578017,07/09/26,420.00,,\"214,048.00\"\n08/09/26,NWD-512345XXXXXX5678-ATM KORAMANGALA 5TH BLOCK,0000261953189,08/09/26,\"2,000.00\",,\"212,048.00\"\n08/09/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-643224662108-ORDER,0000348315126,08/09/26,248.00,,\"211,800.00\"\n08/09/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-610009114172-ORDER,0000511281012,08/09/26,410.00,,\"211,390.00\"\n08/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-667794424223-ORDER,0000845122940,08/09/26,589.00,,\"210,801.00\"\n08/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-684090817027-RIDE,0000264073400,08/09/26,118.00,,\"210,683.00\"\n09/09/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-632051743509-ORDER,0000858511779,09/09/26,\"1,385.00\",,\"209,298.00\"\n09/09/26,UPI-THIRD WAVE COFFEE-thirdwave@icici-ICIC0000001-618879756454-PAYMENT,0000329730155,09/09/26,\"2,350.00\",,\"206,948.00\"\n10/09/26,BIL/BPAY/480612/BESCOM ELECTRICITY,0000168965204,10/09/26,\"1,340.00\",,\"205,608.00\"\n11/09/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-630534077991-ORDER,0000545461013,11/09/26,412.00,,\"205,196.00\"\n11/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-604540490283-RIDE,0000537656494,11/09/26,289.00,,\"204,907.00\"\n12/09/26,POS 512345XXXXXX5678 SPOTIFY INDIA,0000455281184,12/09/26,119.00,,\"204,788.00\"\n12/09/26,UPI-IRCTC-irctc@sbi-SBIN0000691-628242291466-TICKET,0000682624278,12/09/26,\"1,250.00\",,\"203,538.00\"\n13/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-694468447166-ORDER,0000600282414,13/09/26,520.00,,\"203,018.00\"\n13/09/26,UPI-MAKEMYTRIP-mmt@icici-ICIC0000331-689705274973-HOTEL COORG,0000546434187,13/09/26,\"8,400.00\",,\"194,618.00\"\n14/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-661895212988-ORDER,0000166857303,14/09/26,248.00,,\"194,370.00\"\n14/09/26,UPI-APOLLO PHARMACY-apollopharmacy@icici-ICIC0000221-634936514319-MEDICINES,0000322086735,14/09/26,385.00,,\"193,985.00\"\n15/09/26,UPI-AMAZON PRIME VIDEO-amazonprime@apl-UTIB0000100-605323407159-PRIME MONTHLY,0000994310083,15/09/26,299.00,,\"193,686.00\"\n15/09/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-676690793838-ORDER,0000551125671,15/09/26,286.00,,\"193,400.00\"\n15/09/26,UPI-MTR RESTAURANT-mtr1924@okaxis-ICIC0000001-600311570307-PAYMENT,0000518197538,15/09/26,980.00,,\"192,420.00\"\n16/09/26,UPI-JIOHOTSTAR-jiohotstar@icici-ICIC0000104-608928193543-SUBSCRIPTION,0000926561919,16/09/26,299.00,,\"192,121.00\"\n16/09/26,UPI-ZEPTO-zeptonow@ybl-HDFC0000001-627837222462-ORDER,0000727150493,16/09/26,\"1,385.00\",,\"190,736.00\"\n17/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-685351450010-ORDER,0000846812123,17/09/26,589.00,,\"190,147.00\"\n17/09/26,UPI-OLA-olacabs@ybl-UTIB0000001-623756005883-RIDE,0000120972273,17/09/26,118.00,,\"190,029.00\"\n17/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-626889783906-RIDE,0000922050912,17/09/26,342.00,,\"189,687.00\"\n18/09/26,UPI-ACT FIBERNET-actfibernet@axisbank-UTIB0000034-667568028623-BROADBAND,0000718142807,18/09/26,\"1,050.00\",,\"188,637.00\"\n18/09/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-619106649725-ORDER,0000508431021,18/09/26,698.00,,\"187,939.00\"\n19/09/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-600945826486-ORDER,0000612153089,19/09/26,312.00,,\"187,627.00\"\n19/09/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-676174411141-RIDE,0000106330865,19/09/26,118.00,,\"187,509.00\"\n19/09/26,UPI-MEGHANA FOODS-meghanafoods@ybl-ICIC0000001-617163103565-PAYMENT,0000477698143,19/09/26,280.00,,\"187,229.00\"\n20/09/26,BIL/BPAY/955662/AIRTEL POSTPAID,0000420632895,20/09/26,599.00,,\"186,630.00\"\n21/09/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-604717668846-ORDER,0000909037759,21/09/26,698.00,,\"185,932.00\"\n21/09/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-677306329557-ORDER,0000518744974,21/09/26,\"1,385.00\",,\"184,547.00\"\n21/09/26,IMPS-676203099419-ANKIT SHARMA-SBIN0001234-SPLIT DINNER,0000997356828,21/09/26,850.00,,\"183,697.00\"\n22/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-627854643175-ORDER,0000549920675,22/09/26,365.00,,\"183,332.00\"\n22/09/26,UPI-AMAZON PAY-amazon@apl-UTIB0000002-676523879578-ORDER,0000677909930,22/09/26,\"1,299.00\",,\"182,033.00\"\n24/09/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-692581319988-RIDE,0000902638839,24/09/26,342.00,,\"181,691.00\"\n25/09/26,UPI-DMART AVENUE-dmart@ybl-YESB0000001-690745750365-GROCERY,0000888807316,25/09/26,\"2,615.00\",,\"179,076.00\"\n27/09/26,UPI-DECATHLON-decathlonin@hdfcbank-UTIB0000002-696822383884-ORDER,0000686405096,27/09/26,\"1,299.00\",,\"177,777.00\"\n29/09/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-662352513460-ORDER,0000958851904,29/09/26,312.00,,\"177,465.00\"\n29/09/26,UPI-MTR RESTAURANT-mtr1924@okaxis-ICIC0000001-648293833828-PAYMENT,0000747737533,29/09/26,650.00,,\"176,815.00\"\n30/09/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-697624310570-ORDER,0000336801619,30/09/26,410.00,,\"176,405.00\"\n30/09/26,UPI-OLA-olacabs@ybl-UTIB0000001-640608951738-RIDE,0000624232414,30/09/26,236.00,,\"176,169.00\"\n01/10/26,NEFT CR-CITI0000001-ACME TECHNOLOGIES PVT LTD-SALARY OCT26-CITIN2026100145697,0000335602191,01/10/26,,\"85,000.00\",\"261,169.00\"\n02/10/26,UPI-CULTFIT-cultfit.payu@hdfcbank-HDFC0000499-682814512603-CULTPASS ELITE,0000393062061,02/10/26,\"1,599.00\",,\"259,570.00\"\n03/10/26,UPI-RAMESH KUMAR-rameshk@okhdfcbank-HDFC0001234-695393927981-PAYMENT FROM PHONE,0000567975319,03/10/26,\"22,000.00\",,\"237,570.00\"\n03/10/26,UPI-OLA-olacabs@ybl-UTIB0000001-694269698093-RIDE,0000621454127,03/10/26,198.00,,\"237,372.00\"\n03/10/26,UPI-FLIPKART-flipkart@axisbank-UTIB0000002-633290884804-ORDER,0000131165166,03/10/26,\"3,499.00\",,\"233,873.00\"\n04/10/26,UPI-NAMMA METRO-bmrcl@sbi-SBIN0000813-658558805795-CARD RECHARGE,0000517532243,04/10/26,500.00,,\"233,373.00\"\n04/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-698282193584-ORDER,0000460916347,04/10/26,365.00,,\"233,008.00\"\n05/10/26,ACH D- ICCL-MF SIP-HDFC00000012345678,0000818197581,05/10/26,\"5,000.00\",,\"228,008.00\"\n05/10/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-638834359262-ORDER,0000829223044,05/10/26,520.00,,\"227,488.00\"\n07/10/26,POS 512345XXXXXX5678 NETFLIX.COM,0000956998797,07/10/26,649.00,,\"226,839.00\"\n07/10/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-644661071312-ORDER,0000534131719,07/10/26,535.00,,\"226,304.00\"\n08/10/26,NWD-512345XXXXXX5678-ATM KORAMANGALA 5TH BLOCK,0000877583839,08/10/26,\"2,000.00\",,\"224,304.00\"\n08/10/26,UPI-FLIPKART-flipkart@axisbank-UTIB0000002-629233965046-ORDER,0000277215428,08/10/26,899.00,,\"223,405.00\"\n09/10/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-694679919210-RIDE,0000601856351,09/10/26,236.00,,\"223,169.00\"\n10/10/26,BIL/BPAY/459536/BESCOM ELECTRICITY,0000237039296,10/10/26,\"1,180.00\",,\"221,989.00\"\n10/10/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-658698858057-RIDE,0000768143326,10/10/26,198.00,,\"221,791.00\"\n10/10/26,UPI-TOIT BREWPUB-toitbrew@ybl-ICIC0000001-627002088812-PAYMENT,0000673510887,10/10/26,980.00,,\"220,811.00\"\n11/10/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-604033992825-ORDER,0000128955006,11/10/26,286.00,,\"220,525.00\"\n11/10/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-699319509462-RIDE,0000523076025,11/10/26,198.00,,\"220,327.00\"\n11/10/26,UPI-GOPAL PROVISION STORE-gopalstores@okaxis-UTIB0000111-686533160004-PAYMENT,0000735540030,11/10/26,730.00,,\"219,597.00\"\n12/10/26,POS 512345XXXXXX5678 SPOTIFY INDIA,0000706011277,12/10/26,119.00,,\"219,478.00\"\n12/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-676365017788-ORDER,0000811890569,12/10/26,589.00,,\"218,889.00\"\n12/10/26,UPI-ZEPTO-zeptonow@ybl-HDFC0000001-631042286266-ORDER,0000129100607,12/10/26,286.00,,\"218,603.00\"\n13/10/26,UPI-APOLLO PHARMACY-apollopharmacy@icici-ICIC0000221-630263257488-MEDICINES,0000190137896,13/10/26,520.00,,\"218,083.00\"\n14/10/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-646327356259-RIDE,0000790147183,14/10/26,236.00,,\"217,847.00\"\n14/10/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-691822729791-RIDE,0000560219456,14/10/26,342.00,,\"217,505.00\"\n15/10/26,UPI-AMAZON PRIME VIDEO-amazonprime@apl-UTIB0000100-688852123602-PRIME MONTHLY,0000245706210,15/10/26,299.00,,\"217,206.00\"\n15/10/26,UPI-SRI LAKSHMI TIFFINS-srilakshmitiffins@okicici-ICIC0000001-628671600670-PAYMENT,0000595744935,15/10/26,\"1,450.00\",,\"215,756.00\"\n16/10/26,UPI-JIOHOTSTAR-jiohotstar@icici-ICIC0000104-638022971018-SUBSCRIPTION,0000295130056,16/10/26,299.00,,\"215,457.00\"\n17/10/26,UPI-BIGBASKET-bigbasket@icici-HDFC0000001-691910918814-ORDER,0000153992714,17/10/26,\"1,385.00\",,\"214,072.00\"\n17/10/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-652036302425-RIDE,0000379340713,17/10/26,289.00,,\"213,783.00\"\n17/10/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-692506946924-RIDE,0000507059676,17/10/26,342.00,,\"213,441.00\"\n18/10/26,UPI-ACT FIBERNET-actfibernet@axisbank-UTIB0000034-666595224817-BROADBAND,0000451492250,18/10/26,\"1,050.00\",,\"212,391.00\"\n19/10/26,UPI-UBER INDIA-uber.rides@axisbank-UTIB0000001-605435136645-RIDE,0000327268503,19/10/26,118.00,,\"212,273.00\"\n19/10/26,UPI-MEGHANA FOODS-meghanafoods@ybl-ICIC0000001-652832177434-PAYMENT,0000588229686,19/10/26,\"1,450.00\",,\"210,823.00\"\n19/10/26,UPI-URBAN COMPANY-urbancompany@ybl-YESB0000004-666073684406-HOME CLEANING,0000450948014,19/10/26,\"1,899.00\",,\"208,924.00\"\n20/10/26,BIL/BPAY/363319/AIRTEL POSTPAID,0000462388455,20/10/26,599.00,,\"208,325.00\"\n20/10/26,UPI-MEGHANA FOODS-meghanafoods@ybl-ICIC0000001-645761612202-PAYMENT,0000917364173,20/10/26,980.00,,\"207,345.00\"\n22/10/26,UPI-MYNTRA-myntra@icici-UTIB0000002-639018899720-ORDER,0000507083673,22/10/26,\"2,499.00\",,\"204,846.00\"\n23/10/26,UPI-OLA-olacabs@ybl-UTIB0000001-674284273440-RIDE,0000398775766,23/10/26,156.00,,\"204,690.00\"\n24/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-674912113097-ORDER,0000907464398,24/10/26,589.00,,\"204,101.00\"\n24/10/26,UPI-RAPIDO-rapido@ybl-UTIB0000001-628650131267-RIDE,0000993271900,24/10/26,198.00,,\"203,903.00\"\n24/10/26,UPI-MYNTRA-myntra@icici-UTIB0000002-697574552705-DIWALI SALE,0000552651788,24/10/26,\"4,999.00\",,\"198,904.00\"\n25/10/26,UPI-DMART AVENUE-dmart@ybl-YESB0000001-637921761308-GROCERY,0000370874491,25/10/26,\"2,380.00\",,\"196,524.00\"\n25/10/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-686461212064-ORDER,0000996478772,25/10/26,455.00,,\"196,069.00\"\n25/10/26,IMPS-660442337008-ANKIT SHARMA-SBIN0001234-SPLIT DINNER,0000187946147,25/10/26,\"1,200.00\",,\"194,869.00\"\n26/10/26,UPI-ZOMATO-zomato@hdfcbank-ICIC0DC0099-659832398633-ORDER,0000604988121,26/10/26,410.00,,\"194,459.00\"\n26/10/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-615896868772-ORDER,0000120812641,26/10/26,698.00,,\"193,761.00\"\n27/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-678895181912-ORDER,0000904258674,27/10/26,365.00,,\"193,396.00\"\n28/10/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-632086369317-ORDER,0000679196799,28/10/26,412.00,,\"192,984.00\"\n29/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-627306582726-ORDER,0000155926488,29/10/26,410.00,,\"192,574.00\"\n29/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-601770791023-ORDER,0000475767056,29/10/26,365.00,,\"192,209.00\"\n30/10/26,UPI-SWIGGY-swiggy@icici-ICIC0DC0099-634058579637-ORDER,0000340756713,30/10/26,365.00,,\"191,844.00\"\n31/10/26,UPI-BLINKIT-blinkit.payu@hdfcbank-HDFC0000001-637681150998-ORDER,0000798086909,31/10/26,535.00,,\"191,309.00\"\n\n\"**Computer generated statement - does not require signature**\"\n";
+const SAMPLE_SMS = "Update! INR 85,000.00 deposited in HDFC Bank A/c XX1234 on 01-NOV-26 for NEFT Cr-CITI0000001-ACME TECHNOLOGIES PVT LTD-SALARY NOV26.Avl bal INR 1,31,204.50. Cheque deposits subject to clearing\nRs.1599.00 debited from A/c XX1234 on 02-11-26 to VPA cultfit.payu@hdfcbank (CULTFIT). UPI Ref no 690010856275. Not you? Call 18002586161 - HDFC Bank\nSent Rs.22000.00 From HDFC Bank A/C *1234 To RAMESH KUMAR On 03/11/26 Ref 626831877473 Not You? Call 18002586161/SMS BLOCK UPI to 7308080808\nYour A/c XX1234 has been debited by Rs.5,000.00 on 05-Nov-26 towards ACH D- ICCL-MF SIP. Avl Bal Rs.1,02,384.12\nINR 799.00 spent on HDFC Bank Debit Card XX5678 at NETFLIX.COM on 2026-11-07:09:14:22. Avl Bal: INR 98,912.40. Not you? Call 18002586161\nYour OTP for transaction of Rs.1,299.00 at MYNTRA is 482913. Valid for 5 mins. Do not share this OTP with anyone - HDFC Bank\nGet a pre-approved Personal Loan of up to Rs.5,00,000 at attractive rates! Click hdfcbk.io/xyz to apply. T&C apply\nINR 119.00 spent on HDFC Bank Debit Card XX5678 at SPOTIFY INDIA on 2026-11-12:07:01:10. Avl Bal: INR 84,201.11.\nRs.299.00 debited from A/c XX1234 on 15-11-26 to VPA amazonprime@apl (AMAZON PRIME VIDEO). UPI Ref no 603604460472. Not you? Call 18002586161 - HDFC Bank\nRs.299.00 debited from A/c XX1234 on 16-11-26 to VPA jiohotstar@icici (JIOHOTSTAR). UPI Ref no 619848485517. Not you? Call 18002586161 - HDFC Bank\nRs.1050.00 debited from A/c XX1234 on 18-11-26 to VPA actfibernet@axisbank (ACT FIBERNET). UPI Ref no 618204411906. Not you? Call 18002586161 - HDFC Bank\nRs.2000.00 withdrawn at ATM KORAMANGALA 5TH BLOCK from A/c XX1234 on 09-11-26. Avl Bal Rs.92,113.40\nRs.1,410.00 paid via BBPS for BESCOM ELECTRICITY from A/c XX1234 on 10-11-26. Ref 692228242482\nRs.500.00 debited from A/c XX1234 on 05-11-26 to VPA bmrcl@sbi (NAMMA METRO). UPI Ref no 677800710257. Not you? Call 18002586161 - HDFC Bank\nRs.412.00 debited from A/c XX1234 on 01-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 696486586264. Not you? Call 18002586161 - HDFC Bank\nRs.589.00 debited from A/c XX1234 on 02-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 650538442525. Not you? Call 18002586161 - HDFC Bank\nRs.365.00 debited from A/c XX1234 on 03-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 684206667925. Not you? Call 18002586161 - HDFC Bank\nRs.640.00 debited from A/c XX1234 on 04-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 614220803878. Not you? Call 18002586161 - HDFC Bank\nRs.455.00 debited from A/c XX1234 on 06-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 642644245686. Not you? Call 18002586161 - HDFC Bank\nRs.520.00 debited from A/c XX1234 on 07-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 628840768544. Not you? Call 18002586161 - HDFC Bank\nRs.589.00 debited from A/c XX1234 on 08-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 697032321460. Not you? Call 18002586161 - HDFC Bank\nRs.640.00 debited from A/c XX1234 on 09-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 694926943276. Not you? Call 18002586161 - HDFC Bank\nRs.410.00 debited from A/c XX1234 on 11-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 693846294872. Not you? Call 18002586161 - HDFC Bank\nRs.365.00 debited from A/c XX1234 on 12-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 647421030846. Not you? Call 18002586161 - HDFC Bank\nRs.589.00 debited from A/c XX1234 on 13-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 650085852771. Not you? Call 18002586161 - HDFC Bank\nRs.455.00 debited from A/c XX1234 on 14-11-26 to VPA swiggy@icici (SWIGGY). UPI Ref no 688072430966. Not you? Call 18002586161 - HDFC Bank\nRs.640.00 debited from A/c XX1234 on 16-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 614990302189. Not you? Call 18002586161 - HDFC Bank\nRs.520.00 debited from A/c XX1234 on 17-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 651371191447. Not you? Call 18002586161 - HDFC Bank\nRs.589.00 debited from A/c XX1234 on 19-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 620217736696. Not you? Call 18002586161 - HDFC Bank\nRs.410.00 debited from A/c XX1234 on 20-11-26 to VPA zomato@hdfcbank (ZOMATO). UPI Ref no 699540750281. Not you? Call 18002586161 - HDFC Bank\nRs.845.00 debited from A/c XX1234 on 04-11-26 to VPA bigbasket@icici (BIGBASKET). UPI Ref no 690046024017. Not you? Call 18002586161 - HDFC Bank\nRs.535.00 debited from A/c XX1234 on 09-11-26 to VPA zeptonow@ybl (ZEPTO). UPI Ref no 676964171798. Not you? Call 18002586161 - HDFC Bank\nRs.1120.00 debited from A/c XX1234 on 12-11-26 to VPA zeptonow@ybl (ZEPTO). UPI Ref no 657831192507. Not you? Call 18002586161 - HDFC Bank\nRs.698.00 debited from A/c XX1234 on 17-11-26 to VPA bigbasket@icici (BIGBASKET). UPI Ref no 636904397480. Not you? Call 18002586161 - HDFC Bank\nRs.236.00 debited from A/c XX1234 on 03-11-26 to VPA olacabs@ybl (OLA). UPI Ref no 633722851232. Not you? Call 18002586161 - HDFC Bank\nRs.198.00 debited from A/c XX1234 on 06-11-26 to VPA uber.rides@axisbank (UBER INDIA). UPI Ref no 632000950925. Not you? Call 18002586161 - HDFC Bank\nRs.342.00 debited from A/c XX1234 on 10-11-26 to VPA olacabs@ybl (OLA). UPI Ref no 684051864214. Not you? Call 18002586161 - HDFC Bank\nRs.156.00 debited from A/c XX1234 on 13-11-26 to VPA rapido@ybl (RAPIDO). UPI Ref no 644577419627. Not you? Call 18002586161 - HDFC Bank\nRs.289.00 debited from A/c XX1234 on 15-11-26 to VPA uber.rides@axisbank (UBER INDIA). UPI Ref no 622870761702. Not you? Call 18002586161 - HDFC Bank\nRs.415.00 debited from A/c XX1234 on 18-11-26 to VPA olacabs@ybl (OLA). UPI Ref no 648155688071. Not you? Call 18002586161 - HDFC Bank\nRs.2350.00 debited from A/c XX1234 on 08-11-26 to VPA mtr1924@okaxis (MTR RESTAURANT). UPI Ref no 635821482566. Not you? Call 18002586161 - HDFC Bank\nRs.980.00 debited from A/c XX1234 on 14-11-26 to VPA meghanafoods@ybl (MEGHANA FOODS). UPI Ref no 674201008529. Not you? Call 18002586161 - HDFC Bank\nRs.3499.00 debited from A/c XX1234 on 08-11-26 to VPA myntra@icici (MYNTRA). UPI Ref no 668763075434. Not you? Call 18002586161 - HDFC Bank\nRs.1899.00 debited from A/c XX1234 on 19-11-26 to VPA amazon@apl (AMAZON PAY). UPI Ref no 629841701567. Not you? Call 18002586161 - HDFC Bank\nTxn of INR 1,250 done via UPI on 14 Nov at SRI LAKSHMI TIFFINS frm a/c ending 1234. Ref 512398712. -Kotak\nDear Customer, your a/c no. XX1234 is debited for Rs 2,750 on 17Nov26 trf to DECATHLON SPORTS INDIA. If not done by you, report immediately.\n";
+
+/* ---------- small utilities ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr = (n, dp=0) => (n < 0 ? '−' : '') + '₹' + Math.abs(Number(n)||0).toLocaleString('en-IN', {maximumFractionDigits:dp, minimumFractionDigits:dp});
+const pct = (n, dp=0) => (Number.isFinite(n) ? n.toFixed(dp) : '0') + '%';
+const uid = () => Math.random().toString(36).slice(2, 10);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const round = (n, to=1) => Math.round(n / to) * to;
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const monthKey = d => d.slice(0, 7);
+const monthLabel = k => { const [y, m] = k.split('-'); return MONTHS[+m - 1] + ' ' + y; };
+const daysIn = k => { const [y, m] = k.split('-').map(Number); return new Date(y, m, 0).getDate(); };
+const addMonths = (k, n) => { let [y, m] = k.split('-').map(Number); m += n; while (m > 12) { m -= 12; y++; } while (m < 1) { m += 12; y--; } return y + '-' + String(m).padStart(2, '0'); };
+const fmtDate = d => { if (!d) return ''; const [y, m, dd] = d.split('-'); return +dd + ' ' + MONTHS[+m - 1] + ' ' + y; };
+const median = a => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); const h = Math.floor(s.length / 2); return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2; };
+const sum = a => a.reduce((x, y) => x + y, 0);
+function withTimeout(p, ms) { return Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]); }
+function lsGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ---------- categories ---------- */
+const CATS = ['Income','Other income','Rent','Groceries','Food delivery','Dining out','Transport','Fuel','Shopping','Subscriptions','Mobile & Internet','Utilities','Health','Home & services','Entertainment','Travel','Education','Insurance','EMI/Loan','Investments','Cash withdrawal','Transfers','Card payment','Fees & charges','Other'];
+const NOT_SPEND = new Set(['Income','Other income','Investments','Card payment']);
+const FIXED = new Set(['Rent','Subscriptions','Mobile & Internet','Utilities','Insurance','EMI/Loan','Education']);
+const ESSENTIAL = new Set(['Rent','Groceries','Utilities','Mobile & Internet','Transport','Health','Insurance','EMI/Loan','Fuel']);
+const VARIABLE = CATS.filter(c => !NOT_SPEND.has(c) && !FIXED.has(c));
+// ordered: more specific first (e.g. JIOHOTSTAR before JIO, PRIME VIDEO before AMAZON)
+const KEYWORDS = [
+  ['Subscriptions', ['NETFLIX','SPOTIFY','PRIME VIDEO','AMAZON PRIME','JIOHOTSTAR','HOTSTAR','SONYLIV','ZEE5','YOUTUBE PREMIUM','YOUTUBEPREMIUM','APPLE.COM','GOOGLE PLAY','CULTFIT','CULT.FIT','CULTPASS','AUDIBLE','LINKEDIN PREMIUM','CHATGPT','OPENAI']],
+  ['Income', ['SALARY','PAYROLL','SAL CR']],
+  ['Rent', [' RENT ','RENTAL','NOBROKER RENT']],
+  ['Investments', ['MF SIP','SIP ','MUTUAL FUND','ZERODHA','GROWW','KUVERA','ICCL','PPF','NPS ']],
+  ['Food delivery', ['SWIGGY','ZOMATO','EATSURE']],
+  ['Groceries', ['BLINKIT','ZEPTO','BIGBASKET','DMART','INSTAMART','JIOMART','RATNADEEP','NATURES BASKET','MORE RETAIL']],
+  ['Dining out', ['RESTAURANT','CAFE','COFFEE','BREWPUB','BREW','TIFFIN','DHABA','BAKERY','PIZZA','STARBUCKS','MCDONALD','KFC','BURGER']],
+  ['Transport', ['UBER','OLA ','OLACABS','RAPIDO','METRO','BMRCL','NAMMA YATRI','FASTAG']],
+  ['Fuel', ['HPCL','IOCL','BPCL','PETROL','INDIAN OIL','SHELL ']],
+  ['Mobile & Internet', ['AIRTEL','JIO ','JIO PREPAID','VODAFONE','VI POSTPAID','BSNL','ACT FIBERNET','HATHWAY','EXCITEL']],
+  ['Utilities', ['BESCOM','ELECTRICITY','TATA POWER','ADANI ELEC','BWSSB','WATER BILL','INDANE','HP GAS','PIPED GAS']],
+  ['Health', ['APOLLO','PHARMACY','PHARMEASY','1MG','MEDPLUS','HOSPITAL','CLINIC','DIAGNOSTIC','PRACTO']],
+  ['Travel', ['MAKEMYTRIP','GOIBIBO','IRCTC','INDIGO','AIR INDIA','CLEARTRIP','OYO','AIRBNB','REDBUS']],
+  ['Entertainment', ['BOOKMYSHOW','PVR','INOX']],
+  ['Insurance', ['INSURANCE','LIC ','POLICYBAZAAR','ACKO']],
+  ['EMI/Loan', [' EMI','LOAN','BAJAJ FIN']],
+  ['Cash withdrawal', ['ATM CASH','NWD-','CASH WDL','ATM ']],
+  ['Card payment', ['CC PAYMENT','CREDIT CARD PAYMENT','CRED CLUB']],
+  ['Fees & charges', ['CHARGES','ANNUAL FEE','PENALTY','GST ON']],
+  ['Shopping', ['AMAZON','FLIPKART','MYNTRA','AJIO','NYKAA','MEESHO','DECATHLON','CROMA','IKEA']],
+  ['Education', ['COURSERA','UDEMY','UNACADEMY','SCHOOL FEE','COLLEGE']],
+];
+const OTT = ['NETFLIX','PRIME VIDEO','JIOHOTSTAR','HOTSTAR','SONYLIV','ZEE5','YOUTUBE PREMIUM'];
+
+/* ---------- state ---------- */
+const freshState = () => ({
+  version: 1, txns: [], rules: [],
+  profile: { incomeOverride: null, emergencyFund: 120000, emergencyMonths: 6, goals: [], budgets: {}, name: '', age: 27 },
+  subFlags: {}, agentNudges: [], dismissed: {}, reviews: {}, chat: [], log: [], future: null, futureChat: []
+});
+let S = freshState();
+const RT = { tab: 'home', trace: [], busy: false, filter: { month: 'all', cat: 'all', q: '', review: false }, pending: null,
+  whatif: { cuts: { 'Food delivery': 0, 'Dining out': 0, 'Shopping': 0 }, rentDelta: 0, incomePct: 0, cancel: {} }, lastAgentScenario: null, reviewMonth: null, ver: 0, futureSelf: 'plan', tts: null, dict: null, listening: false, autoVoice: false };
+
+/* ---------- storage: Claude per-user db → localStorage → memory ---------- */
+const Store = {
+  mode: 'memory', ref: null, chain: Promise.resolve(), timer: null,
+  async init() {
+    try {
+      if (window.claude && typeof window.claude.use === 'function') {
+        const db = await withTimeout(window.claude.use('db'), 10000);
+        const user = db ? await withTimeout(window.claude.use('user'), 10000) : null;
+        if (db && user) {
+          const id = await user.id();
+          this.ref = db.collection('data/users/' + id).doc('hisaab');
+          const got = await withTimeout(this.ref.get(), 10000);
+          const val = got && typeof got.data === 'function' ? got.data() : got;
+          if (val && val.state && !S.txns.length) { try { S = Object.assign(freshState(), JSON.parse(val.state)); } catch {} }
+          this.mode = 'cloud'; return;
+        }
+      }
+    } catch (e) { console.warn('db unavailable', e); }
+    const raw = lsGet('hisaab_state_v1');
+    if (raw !== null || lsSet('hisaab_probe', '1')) {
+      this.mode = 'browser';
+      if (raw && !S.txns.length) { try { S = Object.assign(freshState(), JSON.parse(raw)); } catch {} }
+    }
+  },
+  save() {
+    RT.ver++;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      const json = JSON.stringify(S);
+      if (this.mode === 'cloud' && this.ref) {
+        this.chain = this.chain.then(() => this.ref.set({ state: json, savedAt: new Date().toISOString() })).catch(e => { console.warn(e); lsSet('hisaab_state_v1', json); });
+      } else if (this.mode === 'browser') lsSet('hisaab_state_v1', json);
+    }, 700);
+  }
+};
+
+/* ---------- AI: Claude (in claude.ai) → Anthropic API key (standalone) → off ---------- */
+const AI = {
+  mode: 'checking', sample: null,
+  async init() {
+    try {
+      if (window.claude && typeof window.claude.use === 'function') {
+        const s = await withTimeout(window.claude.use('sample'), 10000);
+        if (s) { this.sample = s; this.mode = 'claude'; renderChips(); return; }
+      }
+    } catch (e) { console.warn('sample unavailable', e); }
+    this.mode = lsGet('hisaab_api_key') ? 'anthropic' : 'off';
+    renderChips();
+  },
+  get on() { return this.mode === 'claude' || this.mode === 'anthropic'; },
+  async api(body) {
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: {
+      'content-type': 'application/json', 'x-api-key': lsGet('hisaab_api_key') || '', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify(Object.assign({ model: lsGet('hisaab_model') || 'claude-sonnet-5-5', max_tokens: 1800 }, body)) });
+    if (!r.ok) throw new Error('API ' + r.status + ': ' + (await r.text()).slice(0, 180));
+    return r.json();
+  },
+  async json(prompt, tier = 'quick') {
+    if (this.mode === 'claude') {
+      if (typeof this.sample.json === 'function') return await this.sample.json(prompt, { modelTier: tier });
+      const r = await this.sample(prompt, { modelTier: tier }); return parseJSONLoose(r.text);
+    }
+    if (this.mode === 'anthropic') {
+      const r = await this.api({ messages: [{ role: 'user', content: prompt + '\n\nReturn only JSON.' }] });
+      return parseJSONLoose(r.content.filter(b => b.type === 'text').map(b => b.text).join(''));
+    }
+    throw new Error('AI is off');
+  },
+  async text(prompt, tier = 'default') {
+    if (this.mode === 'claude') { const r = await this.sample(prompt, { modelTier: tier, cache: false }); return r.text; }
+    if (this.mode === 'anthropic') { const r = await this.api({ messages: [{ role: 'user', content: prompt }] }); return r.content.filter(b => b.type === 'text').map(b => b.text).join(''); }
+    throw new Error('AI is off');
+  },
+  // agent loop: the model plans, picks tools, we execute them, it continues until done
+  async agent(messages, tools, onText) {
+    if (this.mode === 'claude') {
+      const r = await this.sample(messages, { modelTier: 'default', cache: false,
+        tools: tools.map(t => ({ name: t.name, description: t.description, inputSchema: t.schema, execute: t.run })),
+        onText: ({ text }) => onText && onText(text) });
+      return r.text;
+    }
+    if (this.mode === 'anthropic') {
+      const msgs = messages.map(m => ({ role: m.role, content: m.content }));
+      const defs = tools.map(t => ({ name: t.name, description: t.description, input_schema: t.schema }));
+      for (let step = 0; step < 8; step++) {
+        const r = await this.api({ messages: msgs, tools: defs });
+        msgs.push({ role: 'assistant', content: r.content });
+        const uses = r.content.filter(b => b.type === 'tool_use');
+        const said = r.content.filter(b => b.type === 'text').map(b => b.text).join('');
+        if (said && uses.length) trace('plan', said.trim());
+        if (!uses.length) { onText && onText(said); return said; }
+        const results = [];
+        for (const u of uses) {
+          const t = tools.find(x => x.name === u.name);
+          let out; try { out = t ? await t.run(u.input || {}) : { error: 'unknown tool' }; } catch (e) { out = { error: String(e.message || e) }; }
+          results.push({ type: 'tool_result', tool_use_id: u.id, content: JSON.stringify(out) });
+        }
+        msgs.push({ role: 'user', content: results });
+      }
+      return 'I stopped after 8 steps to stay safe. Try a narrower question.';
+    }
+    throw new Error('AI is off');
+  }
+};
+function parseJSONLoose(t) {
+  if (typeof t !== 'string') return t;
+  const m = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) t = m[1];
+  const i = Math.min(...['[', '{'].map(c => { const k = t.indexOf(c); return k < 0 ? Infinity : k; }));
+  if (i === Infinity) throw new Error('No JSON in model output');
+  return JSON.parse(t.slice(i, Math.max(t.lastIndexOf(']'), t.lastIndexOf('}')) + 1));
+}
+
+/* ---------- agent trace ---------- */
+function trace(kind, text, data) {
+  const e = { kind, text, data: data === undefined ? null : data, at: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) };
+  RT.trace.push(e); if (RT.trace.length > 300) RT.trace.shift();
+  const el = $('#trace'); if (!el) return;
+  el.insertAdjacentHTML('beforeend', traceHTML(e)); el.scrollTop = el.scrollHeight;
+}
+const KLABEL = { plan: 'PLAN', tool: 'TOOL', result: 'RESULT', guard: 'GUARDRAIL', action: 'ACTION', final: 'ANSWER', info: 'STEP', error: 'ERROR' };
+function traceHTML(e) {
+  let d = '';
+  if (e.data !== null) { let s = typeof e.data === 'string' ? e.data : JSON.stringify(e.data, null, 1); if (s.length > 900) s = s.slice(0, 900) + ' …'; d = `<pre>${esc(s)}</pre>`; }
+  return `<div class="tr ${e.kind}"><span class="t">${e.at}</span><span class="k">${KLABEL[e.kind] || e.kind}</span>${esc(e.text)}${d}</div>`;
+}
+function renderTrace() {
+  const el = $('#trace');
+  el.innerHTML = RT.trace.length ? RT.trace.map(traceHTML).join('') : '<div class="muted" style="padding:10px">Nothing yet. Import data or ask the coach, and you will see the agent plan, call tools and act here.</div>';
+  el.scrollTop = el.scrollHeight;
+}
+
+/* ---------- PII masking (before anything goes to the model) ---------- */
+function maskPII(s) {
+  return String(s)
+    .replace(/[A-Za-z0-9._-]+@(ok[a-z]+|ybl|apl|axl|ibl|sbi|icici|hdfcbank|axisbank|paytm|upi|yesbank)\b/gi, '<upi-id>')
+    .replace(/\b\d{10}\b/g, '<phone>')
+    .replace(/\b\d{9,18}\b/g, '<ref>')
+    .replace(/X{2,}\d{4}|\*\d{4}/gi, 'XX••••');
+}
+
+/* ---------- parsing helpers ---------- */
+function parseAmount(s) { if (s == null) return NaN; const t = String(s).replace(/(rs\.?|inr|₹|,|\s)/gi, ''); if (!t || t === '-') return NaN; return parseFloat(t); }
+function parseDateAny(raw, yearHint) {
+  if (!raw) return null; const s = String(raw).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return mk(+m[1], +m[2], +m[3]);
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if (m) return mk(yr(m[3]), +m[2], +m[1]);
+  m = s.match(/^(\d{1,2})[\s\-]?([A-Za-z]{3})[A-Za-z]*[\s\-,]*(\d{2,4})?$/);
+  if (m) { const mo = MONTHS.findIndex(x => x.toLowerCase() === m[2].toLowerCase()); if (mo >= 0) return mk(m[3] ? yr(m[3]) : (yearHint || new Date().getFullYear()), mo + 1, +m[1]); }
+  return null;
+  function yr(y) { y = +y; return y < 100 ? 2000 + y : y; }
+  function mk(y, mo, d) { if (mo < 1 || mo > 12 || d < 1 || d > 31) return null; return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+}
+function splitCSV(line) {
+  const out = []; let cur = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (q) { if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+    else if (c === '"') q = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c;
+  }
+  out.push(cur); return out.map(x => x.trim());
+}
+function normMerchant(m) {
+  let s = String(m || '').toUpperCase();
+  if (/\bATM\b|^NWD/.test(s)) return 'ATM CASH';
+  if (/\bSIP\b|MUTUAL FUND/.test(s)) return 'MF SIP';
+  s = s.replace(/\.COM\b|\.IN\b/g, '').replace(/\b(PVT|PRIVATE)\b|\bLTD\b|\bLIMITED\b|\bINDIA\b|\bTECHNOLOGIES\b/g, ' ')
+       .replace(/\d{3,}/g, ' ').replace(/[^A-Z0-9& ]/g, ' ').replace(/\s+/g, ' ').trim();
+  return s.split(' ').slice(0, 4).join(' ') || 'UNKNOWN';
+}
+function merchantFromNarration(n) {
+  const s = String(n).trim(); let m;
+  if (/^UPI[-\/]/i.test(s)) { const p = s.split(/[-\/]/); return (['DR', 'CR'].includes((p[1] || '').toUpperCase()) ? p[3] : p[1]) || s; }
+  if ((m = s.match(/^POS\s+\S+\s+(.+)$/i))) return m[1];
+  if ((m = s.match(/^NEFT\s*CR-[^-]*-([^-]+)/i))) return m[1];
+  if ((m = s.match(/^IMPS-\d+-([^-]+)/i))) return m[1];
+  if (/^NWD|ATM/i.test(s)) return 'ATM CASH';
+  if ((m = s.match(/^BIL\/\w+\/\d+\/(.+)$/i))) return m[1];
+  if ((m = s.match(/^ACH\s*D-\s*(.+)$/i))) return m[1];
+  return s.split(/\s+/).slice(0, 3).join(' ');
+}
+function mkTxn(date, amount, dir, desc, merchantRaw, source) {
+  return { id: uid(), date, amount: Math.round(amount * 100) / 100, dir, desc: maskPII(desc), merchant: normMerchant(merchantRaw), category: null, catSource: null, confidence: null, needsReview: false, source };
+}
+
+/* CSV: find the header row, map the columns, parse rows; ask the model only if the layout is unrecognisable */
+async function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  let hi = -1, cols = null;
+  for (let i = 0; i < Math.min(lines.length, 40); i++) {
+    const c = splitCSV(lines[i]).map(x => x.toLowerCase());
+    if (c.some(x => /date/.test(x)) && c.some(x => /narration|description|particular|remark|details/.test(x))) { hi = i; cols = c; break; }
+  }
+  let map = null;
+  if (hi >= 0) {
+    const find = re => cols.findIndex(x => re.test(x));
+    map = { date: cols.findIndex(x => /date/.test(x) && !/value/.test(x)), desc: find(/narration|description|particular|remark|details/),
+      debit: find(/withdrawal|debit|\bdr\b|paid out/), credit: find(/deposit|credit|\bcr\b|paid in/), amount: find(/^amount|txn amount|transaction amount/), type: find(/^type|dr\s*\/\s*cr|cr\s*\/\s*dr/) };
+    if (map.date < 0) map.date = find(/date/);
+    if (map.debit < 0 && map.credit < 0 && map.amount < 0) map = null;
+  }
+  if (!map) {
+    if (!AI.on) throw new Error('Could not recognise this CSV layout. Turn AI on so the agent can map the columns.');
+    trace('plan', 'CSV layout not recognised. Asking the model to map the columns (only the first 8 lines are sent, masked).');
+    const head = lines.filter(l => l.trim()).slice(0, 8).map(maskPII).join('\n');
+    const r = await AI.json(`You map bank-statement CSV columns. Lines (0-indexed, non-empty only):\n${head}\n\nReturn JSON {"headerRow":n,"date":i,"desc":i,"debit":i,"credit":i,"amount":i,"type":i} using column indexes, -1 if absent.`);
+    trace('result', 'Column map from model', r);
+    const nonEmpty = lines.map((l, i) => [l, i]).filter(([l]) => l.trim());
+    hi = nonEmpty[r.headerRow] ? nonEmpty[r.headerRow][1] : 0; map = r;
+  }
+  const out = []; let skipped = 0;
+  for (let i = hi + 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const c = splitCSV(lines[i]);
+    const date = parseDateAny(c[map.date]); if (!date) { skipped++; continue; }
+    const desc = c[map.desc] || '';
+    let amt = NaN, dir = null;
+    const dr = parseAmount(c[map.debit]), cr = parseAmount(c[map.credit]);
+    if (dr > 0) { amt = dr; dir = 'debit'; } else if (cr > 0) { amt = cr; dir = 'credit'; }
+    else if (map.amount >= 0) { const a = parseAmount(c[map.amount]); const t = (c[map.type] || '').toLowerCase(); if (Number.isFinite(a)) { amt = Math.abs(a); dir = /cr|credit|deposit/.test(t) ? 'credit' : /dr|debit|withdraw/.test(t) ? 'debit' : (a < 0 ? 'debit' : 'credit'); } }
+    if (!Number.isFinite(amt) || !dir) { skipped++; continue; }
+    out.push(mkTxn(date, amt, dir, desc, merchantFromNarration(desc), 'csv'));
+  }
+  return { txns: out, skipped, unparsed: [] };
+}
+
+/* Indian bank SMS: regex first; lines that look like transactions but don't match go to the model */
+const SMS_SKIP = /\bOTP\b|one[- ]time password|pre-?approved|click .*to apply|apply now|loan of up to|offer|cashback offer|T&C apply/i;
+function parseSMSLine(line, yearHint) {
+  const s = line.trim(); if (!s) return { skip: true };
+  if (SMS_SKIP.test(s) && !/\b(debited|credited|spent|deposited)\b/i.test(s)) return { skip: true, reason: 'promo/OTP' };
+  if (/\bOTP\b/i.test(s)) return { skip: true, reason: 'OTP' };
+  const am = s.match(/(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d{1,2})?)/i); if (!am) return { skip: true, reason: 'no amount' };
+  const amount = parseAmount(am[1]);
+  const deb = s.search(/\b(debited|spent|sent|paid|withdrawn|debit)\b/i), cre = s.search(/\b(credited|deposited|received)\b/i);
+  let dir = null; if (deb >= 0 && (cre < 0 || deb < cre)) dir = 'debit'; else if (cre >= 0) dir = 'credit';
+  const dm = s.match(/(\d{4}-\d{2}-\d{2})/) || s.match(/\b(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})\b/) || s.match(/\b(\d{1,2}[-\s]?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[-\s]?\d{2,4})\b/i);
+  const date = dm ? parseDateAny(dm[1].replace(/(\d)([a-z])/i, '$1 $2').replace(/([a-z])(\d)/i, '$1 $2'), yearHint) : null;
+  if (!dir || !date) return { unparsed: true };
+  let m, merchant = null;
+  const pats = [/to VPA\s+\S+\s*\(([^)]+)\)/i, /\bTo\s+([A-Z][A-Za-z .&'-]{2,40}?)\s+On\b/i, /withdrawn at\s+(.+?)\s+from\b/i, /for\s+NEFT\s*Cr-[^-]+-([^-]+)/i,
+    /towards\s+(.+?)(?:\.\s|\.$|$)/i, /\bfor\s+([A-Z][A-Z .&]{2,40}?)\s+from\b/, /trf to\s+(.+?)(?:\.|$)/i, /\bat\s+([A-Z0-9][A-Za-z0-9 .&'-]{2,40}?)(?:\s+on\b|,)/i, /to VPA\s+([^\s(]+)/i];
+  for (const p of pats) { if ((m = s.match(p))) { merchant = m[1]; break; } }
+  if (!merchant) return { unparsed: true };
+  if (/@/.test(merchant)) merchant = merchant.split('@')[0].replace(/[._]/g, ' ');
+  return { txn: mkTxn(date, amount, dir, s, merchant, 'sms') };
+}
+async function parseSMS(text) {
+  const yearHint = S.txns.length ? +S.txns[S.txns.length - 1].date.slice(0, 4) : new Date().getFullYear();
+  const out = [], unparsed = []; let skipped = 0;
+  for (const line of text.split(/\r?\n/)) {
+    const r = parseSMSLine(line, yearHint);
+    if (r.txn) out.push(r.txn); else if (r.unparsed) unparsed.push(line.trim()); else if (line.trim()) skipped++;
+  }
+  return { txns: out, skipped, unparsed };
+}
+
+/* PDF: pdf.js from cdnjs extracts text lines; rows that match a date + amount pattern are parsed, the rest go to the model */
+async function loadPdfJs() {
+  if (window.pdfjsLib) return window.pdfjsLib;
+  await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; sc.onload = res; sc.onerror = () => rej(new Error('Could not load the PDF reader')); document.head.appendChild(sc); });
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  return window.pdfjsLib;
+}
+async function pdfToLines(buf) {
+  const lib = await loadPdfJs();
+  const doc = await lib.getDocument({ data: buf }).promise; const lines = [];
+  for (let p = 1; p <= doc.numPages; p++) {
+    const tc = await (await doc.getPage(p)).getTextContent(); const rows = {};
+    for (const it of tc.items) { const y = Math.round(it.transform[5]); (rows[y] = rows[y] || []).push(it); }
+    Object.keys(rows).map(Number).sort((a, b) => b - a).forEach(y => lines.push(rows[y].sort((a, b) => a.transform[4] - b.transform[4]).map(i => i.str).join(' ').replace(/\s+/g, ' ').trim()));
+  }
+  return lines.filter(Boolean);
+}
+async function parseStatementText(lines) {
+  const out = [], unparsed = []; let skipped = 0;
+  for (const l of lines) {
+    const m = l.match(/^(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}|\d{1,2}\s?[A-Za-z]{3}\s?\d{2,4}|\d{4}-\d{2}-\d{2})\s+(.+?)\s+([\d,]+\.\d{2})\s+(?:([\d,]+\.\d{2})\s+)?([\d,]+\.\d{2})\s*(Cr|Dr)?$/i);
+    if (m) {
+      const date = parseDateAny(m[1]); const desc = m[2];
+      // pattern: amount [amount] balance → a single amount column; direction from words
+      const amt = parseAmount(m[3]); const dir = /\b(salary|neft cr|credit|deposit|refund|interest)\b/i.test(desc) ? 'credit' : 'debit';
+      if (date && amt > 0) { out.push(mkTxn(date, amt, dir, desc, merchantFromNarration(desc), 'pdf')); continue; }
+    }
+    if (/(\d[\d,]*\.\d{2})/.test(l) && /\d{1,2}[\/\-\s]/.test(l)) unparsed.push(l); else skipped++;
+  }
+  return { txns: out, skipped, unparsed };
+}
+async function aiExtract(lines, source) {
+  if (!lines.length) return [];
+  if (!AI.on) { trace('info', `${lines.length} line(s) need AI to read. AI is off, so they were skipped.`); return []; }
+  trace('plan', `${lines.length} line(s) did not match any known bank format. Asking the model to extract them (masked first).`);
+  const chunk = lines.slice(0, 60).map(maskPII);
+  const r = await AI.json(`Extract bank transactions from these Indian bank SMS / statement lines. Ignore OTPs, offers and balance alerts.
+Return a JSON array of {"line":index,"date":"YYYY-MM-DD","amount":number,"direction":"debit"|"credit","payee":"merchant or person"}. If the year is missing, assume ${new Date().getFullYear()}.
+LINES:\n${chunk.map((l, i) => i + ': ' + l).join('\n')}`);
+  const arr = Array.isArray(r) ? r : (r.transactions || []);
+  trace('result', `Model extracted ${arr.length} transaction(s)`, arr);
+  return arr.filter(x => x && x.date && x.amount > 0).map(x => mkTxn(x.date, +x.amount, x.direction === 'credit' ? 'credit' : 'debit', chunk[x.line] || '', x.payee || 'UNKNOWN', source + '+ai'));
+}
+
+/* ---------- categorisation: learned rules → keyword rules → model for unknown payees ---------- */
+function ruleCategory(t) {
+  for (const r of S.rules) if (t.merchant.includes(r.pattern)) return { category: r.category, src: 'learned', rule: r };
+  const hay = ' ' + (t.merchant + ' ' + t.desc).toUpperCase() + ' ';
+  if (t.dir === 'credit') return /SALARY|PAYROLL|SAL CR/.test(hay) ? { category: 'Income', src: 'rule' } : { category: 'Other income', src: 'rule' };
+  for (const [cat, kws] of KEYWORDS) for (const k of kws) if (hay.includes(k)) return { category: cat, src: 'rule' };
+  return null;
+}
+async function categorise(txns) {
+  const unknown = [];
+  for (const t of txns) {
+    const r = ruleCategory(t);
+    if (r) { t.category = r.category; t.catSource = r.src; t.confidence = 1; if (r.rule) r.rule.hits = (r.rule.hits || 0) + 1; }
+    else unknown.push(t);
+  }
+  const ruleHits = txns.length - unknown.length;
+  trace('result', `Rules categorised ${ruleHits} of ${txns.length} transaction(s): no AI needed for these.`);
+  if (!unknown.length) return;
+  const groups = {};
+  for (const t of unknown) (groups[t.merchant] = groups[t.merchant] || []).push(t);
+  const items = Object.entries(groups).map(([m, ts], i) => ({ id: i, payee: m, example: ts[0].desc.slice(0, 90), count: ts.length,
+    avgAmount: Math.round(sum(ts.map(t => t.amount)) / ts.length), daysOfMonth: [...new Set(ts.map(t => +t.date.slice(8)))].slice(0, 6) }));
+  if (!AI.on) { for (const t of unknown) { t.category = 'Other'; t.catSource = 'default'; t.needsReview = true; } trace('info', `${items.length} unknown payee(s) left as "Other" for you to review (AI is off).`); return; }
+  trace('plan', `${items.length} payee(s) are unknown to the rules. Asking the model to categorise them, using amount and timing patterns as clues.`, items.map(x => x.payee));
+  let res = [];
+  try {
+    res = await AI.json(`You categorise payees from an Indian bank account. Allowed categories: ${CATS.filter(c => c !== 'Income').join(', ')}.
+Clues: a large payment to a person early each month is often Rent; small repeated payments to a person may be a household helper (Home & services) or a Transfer; split bills to friends are Transfers.
+For each item return {"id":number,"category":string,"confidence":0..1,"reason":"max 8 words"}. Return a JSON array only.
+ITEMS: ${JSON.stringify(items)}`);
+    if (!Array.isArray(res)) res = res.items || [];
+  } catch (e) { trace('error', 'Categorisation call failed: ' + e.message); }
+  trace('result', 'Model categories', res.map(r => ({ payee: items[r.id] && items[r.id].payee, category: r.category, confidence: r.confidence, reason: r.reason })));
+  for (const it of items) {
+    const r = res.find(x => x.id === it.id) || {};
+    const cat = CATS.includes(r.category) ? r.category : 'Other';
+    for (const t of groups[it.payee]) { t.category = cat; t.catSource = 'ai'; t.confidence = r.confidence ?? 0.5; t.needsReview = !(r.confidence >= 0.75); t.reason = r.reason || ''; }
+  }
+}
+
+/* ---------- import pipeline (the agent runs these steps on its own) ---------- */
+async function runImport(kind, payload, label) {
+  if (RT.busy) return; RT.busy = true; render();
+  trace('plan', `New ${label}. Plan: parse → extract messy lines → mask personal data → de-duplicate → categorise → rebuild money model → check for nudges.`);
+  try {
+    let r;
+    if (kind === 'csv') r = await parseCSV(payload);
+    else if (kind === 'sms') r = await parseSMS(payload);
+    else if (kind === 'pdf') { const lines = await pdfToLines(payload); trace('result', `Read ${lines.length} text lines from the PDF.`); r = await parseStatementText(lines); }
+    else if (kind === 'text') r = await parseStatementText(payload.split(/\r?\n/).map(x => x.trim()).filter(Boolean));
+    trace('result', `Parsed ${r.txns.length} transaction(s) with rules; ignored ${r.skipped} line(s) (headers, OTPs, offers); ${r.unparsed.length} need the model.`);
+    const extra = await aiExtract(r.unparsed, kind);
+    let all = r.txns.concat(extra);
+    const seen = new Set(S.txns.map(t => t.date + '|' + t.amount + '|' + t.merchant));
+    const fresh = all.filter(t => !seen.has(t.date + '|' + t.amount + '|' + t.merchant));
+    if (fresh.length < all.length) trace('info', `Skipped ${all.length - fresh.length} duplicate(s) already in your history.`);
+    await categorise(fresh);
+    S.txns = S.txns.concat(fresh).sort((a, b) => a.date.localeCompare(b.date));
+    S.log.push({ at: new Date().toISOString(), label, added: fresh.length });
+    ensureDefaults();
+    Store.save();
+    const M = model();
+    trace('action', `Added ${fresh.length} transaction(s). Money model rebuilt: ${M.recurring.length} recurring payment(s), ${M.nudges.length} nudge(s).`);
+    toast(`Imported ${fresh.length} transactions`);
+  } catch (e) { trace('error', e.message || String(e)); toast(e.message || 'Import failed'); }
+  RT.busy = false; render();
+}
+function ensureDefaults() {
+  const M = model(true);
+  for (const c of VARIABLE) if (S.profile.budgets[c] == null && (M.avgCat[c] || 0) > 0) S.profile.budgets[c] = Math.max(500, Math.ceil(M.avgCat[c] / 500) * 500);
+  if (!S.profile.goals.length && S.txns.length > 30) {
+    const base = M.latest;
+    S.profile.goals.push({ id: uid(), name: 'Goa trip', target: 30000, saved: 12000, by: addMonths(base, 4) + '-28' });
+    S.profile.goals.push({ id: uid(), name: 'New laptop', target: 80000, saved: 20000, by: addMonths(base, 8) + '-30' });
+  }
+}
+
+/* ---------- the living money model ---------- */
+let _M = null, _MV = -1;
+function model(force) {
+  if (!force && _M && _MV === RT.ver) return _M;
+  const tx = S.txns; const M = { months: [], full: [], latest: null, asOf: null, catByMonth: {}, avgCat: {}, income: 0, spend: 0 };
+  if (!tx.length) { _M = Object.assign(M, { recurring: [], nudges: [], goals: [], fixed: 0, essential: 0, surplus: 0, free: 0, invest: 0, rate: 0, emergency: { fund: S.profile.emergencyFund, target: 0, months: 0 } }); _MV = RT.ver; return _M; }
+  M.asOf = tx[tx.length - 1].date; M.latest = monthKey(M.asOf);
+  const months = [...new Set(tx.map(t => monthKey(t.date)))].sort(); M.months = months;
+  const first = tx[0].date;
+  M.full = months.filter(k => !(k === M.latest && +M.asOf.slice(8) < daysIn(k) - 2) && !(k === monthKey(first) && +first.slice(8) > 3));
+  if (!M.full.length) M.full = months.slice(0, 1);
+  for (const t of tx) { const k = monthKey(t.date); const c = t.category || 'Other'; M.catByMonth[k] = M.catByMonth[k] || {}; M.catByMonth[k][c] = (M.catByMonth[k][c] || 0) + t.amount; }
+  for (const c of CATS) M.avgCat[c] = sum(M.full.map(k => (M.catByMonth[k] || {})[c] || 0)) / M.full.length;
+  M.incomeDetected = M.avgCat['Income'] || 0;
+  M.income = S.profile.incomeOverride || M.incomeDetected;
+  M.spendByCat = {}; for (const c of CATS) if (!NOT_SPEND.has(c) && M.avgCat[c] > 0) M.spendByCat[c] = M.avgCat[c];
+  M.spend = sum(Object.values(M.spendByCat));
+  M.invest = M.avgCat['Investments'] || 0;
+  M.surplus = M.income - M.spend; M.rate = M.income ? (M.surplus / M.income) * 100 : 0;
+  M.fixed = sum(Object.entries(M.spendByCat).filter(([c]) => FIXED.has(c)).map(([, v]) => v));
+  M.essential = sum(Object.entries(M.avgCat).filter(([c]) => ESSENTIAL.has(c)).map(([, v]) => v));
+  M.recurring = detectRecurring(M);
+  const target = Math.round(M.essential * (S.profile.emergencyMonths || 6));
+  M.emergency = { fund: +S.profile.emergencyFund || 0, target, months: M.essential ? (+S.profile.emergencyFund || 0) / M.essential : 0 };
+  M.free = M.surplus - M.invest;
+  M.goals = projectGoals(M.free, M);
+  M.nudges = computeNudges(M);
+  _M = M; _MV = RT.ver; return M;
+}
+function detectRecurring(M) {
+  const g = {};
+  for (const t of S.txns) if (t.dir === 'debit') (g[t.merchant] = g[t.merchant] || []).push(t);
+  const out = [];
+  for (const [mer, ts] of Object.entries(g)) {
+    if (ts.length < 2) continue;
+    const ds = ts.map(t => new Date(t.date).getTime()).sort((a, b) => a - b);
+    const gaps = ds.slice(1).map((d, i) => (d - ds[i]) / 864e5);
+    const gap = median(gaps);
+    let cadence = null;
+    if (gap >= 26 && gap <= 35) cadence = 'monthly'; else if (gap >= 6 && gap <= 8) cadence = 'weekly'; else if (gap >= 85 && gap <= 95) cadence = 'quarterly';
+    if (!cadence) continue;
+    const amts = ts.map(t => t.amount); const med = median(amts);
+    const consistent = amts.filter(a => Math.abs(a - med) / med < 0.3).length >= Math.ceil(amts.length * 0.6);
+    const cat = ts[ts.length - 1].category;
+    if (!consistent && !FIXED.has(cat) && cat !== 'Investments') continue;
+    if (!FIXED.has(cat) && cat !== 'Investments' && (cat === 'Cash withdrawal' || med < 1000)) continue;
+    // monthly-cadence check for many-per-month merchants (e.g. food delivery) — not recurring bills
+    const perMonth = ts.length / Math.max(1, new Set(ts.map(t => monthKey(t.date))).size);
+    if (perMonth > 1.6) continue;
+    const last = ts[ts.length - 1], prev = ts[ts.length - 2];
+    const monthly = cadence === 'monthly' ? med : cadence === 'weekly' ? med * 4.33 : med / 3;
+    const next = new Date(new Date(last.date).getTime() + gap * 864e5).toISOString().slice(0, 10);
+    const r = { merchant: mer, category: cat, cadence, amount: last.amount, typical: med, monthly, yearly: monthly * 12, count: ts.length, last: last.date, next, alerts: [],
+      kind: cat === 'Subscriptions' ? 'subscription' : cat === 'Rent' ? 'rent' : cat === 'Investments' ? 'investment' : FIXED.has(cat) ? 'bill' : 'other', flag: S.subFlags[mer] || null };
+    const prevMed = median(ts.slice(0, -1).map(t => t.amount));
+    if (Math.abs(last.amount - prevMed) / prevMed > 0.05 && ['subscription', 'rent', 'investment'].includes(r.kind) || (Math.abs(last.amount - prevMed) / prevMed > 0.05 && cat === 'Mobile & Internet')) r.alerts.push({ type: 'price', level: last.amount > prevMed ? 'warn' : 'info', text: `${title(mer)} changed from ${inr(prevMed)} to ${inr(last.amount)} (${last.amount > prevMed ? '+' : ''}${pct((last.amount / prevMed - 1) * 100)}).` });
+    const overdueDays = (new Date(M.asOf) - new Date(next)) / 864e5;
+    if (overdueDays > 7) r.alerts.push({ type: 'missed', level: 'info', text: `No ${title(mer)} payment since ${fmtDate(last.date)}. Did it stop, or move to another account?` });
+    if (r.kind === 'subscription' && r.flag === 'unused') r.alerts.push({ type: 'unused', level: 'bad', text: `You marked ${title(mer)} as unused: cancelling saves ${inr(r.yearly)} a year.` });
+    out.push(r);
+  }
+  const ott = out.filter(r => r.kind === 'subscription' && OTT.some(o => r.merchant.includes(o)) && r.flag !== 'unused');
+  if (ott.length >= 2) { const tot = sum(ott.map(r => r.monthly)); for (const r of ott) r.alerts.push({ type: 'overlap', level: 'warn', text: `${ott.length} video streaming apps (${ott.map(r => title(r.merchant)).join(', ')}) cost ${inr(tot)}/month together. Keep the one you watch most?` }); }
+  return out.sort((a, b) => b.monthly - a.monthly);
+}
+const title = s => String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+function projectGoals(surplus, M, overrides) {
+  const goals = [];
+  if (M.emergency && M.emergency.fund < M.emergency.target) goals.push({ id: 'ef', name: `Emergency fund (${S.profile.emergencyMonths || 6} months)`, target: M.emergency.target, saved: M.emergency.fund, by: addMonths(M.latest, 12) + '-28', auto: true });
+  for (const g of S.profile.goals) goals.push(Object.assign({}, g));
+  let pool = Math.max(0, surplus);
+  for (const g of goals) { const left = Math.max(1, monthsBetween(M.latest, g.by.slice(0, 7))); g.monthsLeft = left; g.remaining = Math.max(0, g.target - g.saved); g.required = g.remaining / left; }
+  const order = goals.slice().sort((a, b) => a.by.localeCompare(b.by));
+  for (const g of order) { g.alloc = Math.min(pool, g.required); pool -= g.alloc; }
+  if (pool > 0 && order.length) order[order.length - 1].alloc += pool;
+  for (const g of goals) {
+    g.monthsNeeded = g.remaining <= 0 ? 0 : g.alloc > 0 ? Math.ceil(g.remaining / g.alloc) : Infinity;
+    g.eta = Number.isFinite(g.monthsNeeded) ? addMonths(M.latest, g.monthsNeeded) : null;
+    g.onTrack = g.alloc + 1 >= g.required;
+  }
+  return goals;
+}
+function monthsBetween(a, b) { const [y1, m1] = a.split('-').map(Number), [y2, m2] = b.split('-').map(Number); return (y2 - y1) * 12 + (m2 - m1); }
+function computeNudges(M) {
+  const n = []; const k = M.latest; const day = +M.asOf.slice(8), dim = daysIn(k);
+  const cur = M.catByMonth[k] || {};
+  const partial = day < dim - 2;
+  const cnt = {}; for (const t of S.txns) if (monthKey(t.date) === k && t.dir === 'debit') cnt[t.category] = (cnt[t.category] || 0) + 1;
+  for (const c of VARIABLE) {
+    const b = S.profile.budgets[c]; const spent = cur[c] || 0; if (!b || !spent) continue;
+    const proj = partial && (cnt[c] || 0) >= 3 ? spent / day * dim : spent;
+    if (proj > b * 1.1 && spent > b * day / dim + 300) n.push({ id: 'drift-' + c + k, level: proj > b * 1.4 ? 'bad' : 'warn', cat: c,
+      text: `${c}: ${inr(spent)} spent by ${fmtDate(M.asOf)}, against a ${inr(b)} monthly budget. At this pace you'll end ${MONTHS[+k.slice(5) - 1]} near ${inr(round(proj, 10))}.` });
+  }
+  for (const r of M.recurring) for (const a of r.alerts) n.push({ id: a.type === 'overlap' ? 'overlap' : a.type + r.merchant, level: a.level, text: a.text });
+  for (const g of M.goals) if (!g.onTrack && g.remaining > 0) n.push({ id: 'goal' + g.name, level: 'warn', text: `${g.name} is off track: it needs ${inr(g.required)}/month to hit ${fmtDate(g.by)}, but your surplus covers about ${inr(g.alloc)}.` });
+  if (M.emergency.target && M.emergency.months < 3) n.push({ id: 'ef-low', level: 'warn', text: `Your emergency fund covers ${M.emergency.months.toFixed(1)} months of essentials. Aim for at least 3, ideally ${S.profile.emergencyMonths}.` });
+  for (const x of S.agentNudges) n.push(Object.assign({ agent: true }, x));
+  const seen = new Set(); return n.filter(x => !S.dismissed[x.id] && !seen.has(x.id) && seen.add(x.id));
+}
+
+/* ---------- what-if simulator (deterministic: the model never does the maths) ---------- */
+function simulate(changes) {
+  const M = model(); const cat = Object.assign({}, M.spendByCat); let income = M.income; const applied = [];
+  for (const ch of changes || []) {
+    const c = CATS.find(x => x.toLowerCase() === String(ch.category || '').toLowerCase());
+    if (ch.kind === 'cut_category_pct' && c) { const before = cat[c] || 0; cat[c] = before * (1 - (+ch.pct || 0) / 100); applied.push(`${c} ${ch.pct > 0 ? '−' : '+'}${Math.abs(ch.pct)}% (${inr(before)} → ${inr(cat[c])}/month)`); }
+    else if (ch.kind === 'change_category_amount' && c) { cat[c] = Math.max(0, (cat[c] || 0) + (+ch.amount || 0)); applied.push(`${c} ${ch.amount >= 0 ? '+' : '−'}${inr(Math.abs(ch.amount))}/month`); }
+    else if (ch.kind === 'change_rent') { const before = cat['Rent'] || 0; cat['Rent'] = ch.pct != null ? before * (1 + ch.pct / 100) : before + (+ch.amount || 0); applied.push(`Rent ${inr(before)} → ${inr(cat['Rent'])}/month`); }
+    else if (ch.kind === 'change_income_pct') { const b = income; income = income * (1 + (+ch.pct || 0) / 100); applied.push(`Income ${inr(b)} → ${inr(income)}/month`); }
+    else if (ch.kind === 'change_income_amount') { const b = income; income += (+ch.amount || 0); applied.push(`Income ${inr(b)} → ${inr(income)}/month`); }
+    else if (ch.kind === 'cancel_subscription') { const r = M.recurring.find(x => x.merchant.includes(String(ch.merchant || '').toUpperCase())); if (r) { cat[r.category] = Math.max(0, (cat[r.category] || 0) - r.monthly); applied.push(`Cancel ${title(r.merchant)} (−${inr(r.monthly)}/month)`); } }
+  }
+  const spend = sum(Object.values(cat)); const surplus = income - spend;
+  const base = { income: M.income, spend: M.spend, surplus: M.surplus, rate: M.rate };
+  const scen = { income, spend, surplus, rate: income ? surplus / income * 100 : 0 };
+  const gB = M.goals, gS = projectGoals(surplus - M.invest, M);
+  return { applied, base, scen, deltaMonthly: surplus - M.surplus, deltaYearly: (surplus - M.surplus) * 12,
+    goals: gS.map((g, i) => ({ name: g.name, target: g.target, by: g.by, baseEta: gB[i] && gB[i].eta, newEta: g.eta, onTrack: g.onTrack, baseOnTrack: gB[i] && gB[i].onTrack })) };
+}
+
+/* ---------- guardrails ---------- */
+const SECURITY_ASK = /\b(which|what|best|top|suggest|recommend|tip|should i (buy|sell|invest)|where (should|can) i invest|good (stock|share|fund))\b[\s\S]{0,60}\b(stocks?|shares?|mutual funds?|funds?|schemes?|crypto|bitcoin|ethereum|ipo|etfs?|smallcap|small cap|midcap|mid cap|penny|nifty|sensex|f&o|options)\b|\b(buy|sell)\b[\s\S]{0,25}\b(stocks?|shares?|crypto|bitcoin)\b|\b(reliance|tcs|infosys|hdfc bank|adani|tata motors|zomato|paytm|nifty ?bees)\b[\s\S]{0,30}\b(buy|sell|invest|share|stock)\b/i;
+const DISTRESS = /\b(kill myself|end my life|suicid|want to die|no reason to live)\b/i;
+function guardInput(q) {
+  if (DISTRESS.test(q)) return { kind: 'distress', reply: "I'm really sorry you're going through this. Money pressure can feel overwhelming, but you don't have to handle it alone. Please talk to someone you trust today. In India you can call Tele-MANAS on 14416 (free, 24×7). When you're ready, I can help you list what's due and find the smallest next step." };
+  if (SECURITY_ASK.test(q)) return { kind: 'securities', reply: "I can't recommend specific stocks, mutual fund schemes, crypto or other securities, and I don't predict returns. That needs a SEBI-registered investment adviser who knows your full situation.\n\nWhat I can do: check your emergency fund first, show how much you could invest each month without missing your goals, and explain general ideas like diversification, costs and matching risk to your time horizon. Want me to run that?" };
+  return null;
+}
+const SECURITY_OUT = /\b(buy|invest in|sell|switch to)\s+(the\s+)?([A-Z][\w&.-]+(\s+[A-Z][\w&.-]+){0,4})\s+(fund|scheme|shares?|stock|etf|bluechip|small ?cap|mid ?cap)\b/;
+function guardOutput(text) { return SECURITY_OUT.test(text) ? { blocked: true, text: text.replace(SECURITY_OUT, '[specific security removed by guardrail]') } : { blocked: false, text }; }
+
+/* ---------- agent tools (the coach decides which to call) ---------- */
+function toolDefs() {
+  const T = (name, description, schema, fn) => ({ name, description, schema, run: async input => {
+    trace('tool', name, input);
+    try { const out = await fn(input || {}); trace(['create_nudge', 'set_budget', 'add_goal', 'add_category_rule', 'mark_subscription'].includes(name) ? 'action' : 'result', name + ' → done', out); return out; }
+    catch (e) { trace('error', name + ' failed: ' + e.message); return { error: e.message }; }
+  } });
+  const obj = (props, req) => ({ type: 'object', properties: props, required: req || [] });
+  return [
+    T('get_overview', "Snapshot of the user's money model: monthly income, spend, surplus, savings rate, emergency fund, goals, top spending categories. Call this first for most questions.", obj({}), () => {
+      const M = model(); return { asOf: M.asOf, monthsOfData: M.months, income: Math.round(M.income), avgMonthlySpend: Math.round(M.spend), surplus: Math.round(M.surplus), freeForGoalsAfterSIPs: Math.round(M.free), savingsRatePct: +M.rate.toFixed(1), investsMonthly: Math.round(M.invest),
+        fixedCosts: Math.round(M.fixed), emergencyFund: { have: M.emergency.fund, target: M.emergency.target, monthsCovered: +M.emergency.months.toFixed(1) },
+        topCategories: Object.entries(M.spendByCat).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([c, v]) => ({ category: c, avgMonthly: Math.round(v), budget: S.profile.budgets[c] || null })),
+        goals: M.goals.map(g => ({ name: g.name, target: g.target, saved: g.saved, by: g.by, neededPerMonth: Math.round(g.required), onTrack: g.onTrack, projectedMonth: g.eta })) };
+    }),
+    T('category_summary', 'Spending by category for one month (YYYY-MM), compared with the average of full months.', obj({ month: { type: 'string', description: 'YYYY-MM; omit for the latest month' } }), ({ month }) => {
+      const M = model(); const k = month || M.latest; const cur = M.catByMonth[k] || {};
+      return { month: k, partialMonth: k === M.latest, asOf: M.asOf, categories: Object.keys(cur).filter(c => !NOT_SPEND.has(c)).map(c => ({ category: c, spent: Math.round(cur[c]), avgFullMonth: Math.round(M.avgCat[c] || 0), budget: S.profile.budgets[c] || null })).sort((a, b) => b.spent - a.spent) };
+    }),
+    T('query_transactions', 'Find transactions by month, category or payee text. Returns at most 25 rows plus the total.', obj({ month: { type: 'string' }, category: { type: 'string' }, payee: { type: 'string' }, min_amount: { type: 'number' } }), q => {
+      let r = S.txns.filter(t => (!q.month || t.date.startsWith(q.month)) && (!q.category || (t.category || '').toLowerCase() === q.category.toLowerCase()) && (!q.payee || t.merchant.includes(String(q.payee).toUpperCase())) && (!q.min_amount || t.amount >= q.min_amount));
+      return { count: r.length, total: Math.round(sum(r.map(t => t.dir === 'debit' ? t.amount : 0))), rows: r.slice(-25).map(t => ({ date: t.date, payee: title(t.merchant), amount: t.amount, dir: t.dir, category: t.category })) };
+    }),
+    T('list_recurring', 'Recurring payments and subscriptions with alerts (price changes, overlaps, unused, missed).', obj({}), () => model().recurring.map(r => ({ payee: title(r.merchant), category: r.category, cadence: r.cadence, amount: r.amount, monthly: Math.round(r.monthly), yearly: Math.round(r.yearly), next: r.next, userFlag: r.flag, alerts: r.alerts.map(a => a.text) }))),
+    T('simulate_what_if', 'Run a what-if scenario on the money model. The maths is done by code, not by you. Kinds: cut_category_pct {category,pct}, change_category_amount {category,amount}, change_rent {amount|pct}, change_income_pct {pct}, change_income_amount {amount}, cancel_subscription {merchant}.',
+      obj({ changes: { type: 'array', items: obj({ kind: { type: 'string', enum: ['cut_category_pct', 'change_category_amount', 'change_rent', 'change_income_pct', 'change_income_amount', 'cancel_subscription'] }, category: { type: 'string' }, pct: { type: 'number' }, amount: { type: 'number' }, merchant: { type: 'string' } }, ['kind']) } }, ['changes']), ({ changes }) => {
+        const r = simulate(changes); RT.lastAgentScenario = { changes, result: r };
+        return { applied: r.applied, before: { spend: Math.round(r.base.spend), surplus: Math.round(r.base.surplus), savingsRatePct: +r.base.rate.toFixed(1) }, after: { spend: Math.round(r.scen.spend), surplus: Math.round(r.scen.surplus), savingsRatePct: +r.scen.rate.toFixed(1) }, extraPerYear: Math.round(r.deltaYearly), goals: r.goals.map(g => ({ name: g.name, before: g.baseEta, after: g.newEta, onTrackAfter: g.onTrack })) };
+      }),
+    T('set_budget', 'Set a monthly budget for a spending category (low-risk action; the user can undo).', obj({ category: { type: 'string' }, monthly_amount: { type: 'number' } }, ['category', 'monthly_amount']), ({ category, monthly_amount }) => {
+      const c = CATS.find(x => x.toLowerCase() === String(category).toLowerCase()); if (!c) throw new Error('Unknown category ' + category);
+      const before = S.profile.budgets[c] || null; S.profile.budgets[c] = Math.round(monthly_amount); Store.save(); return { category: c, before, after: S.profile.budgets[c] };
+    }),
+    T('add_goal', 'Create or update a savings goal (low-risk action).', obj({ name: { type: 'string' }, target_amount: { type: 'number' }, target_date: { type: 'string', description: 'YYYY-MM-DD' }, saved_so_far: { type: 'number' } }, ['name', 'target_amount', 'target_date']), g => {
+      const ex = S.profile.goals.find(x => x.name.toLowerCase() === g.name.toLowerCase());
+      const v = { id: ex ? ex.id : uid(), name: g.name, target: Math.round(g.target_amount), saved: Math.round(g.saved_so_far || (ex ? ex.saved : 0)), by: g.target_date };
+      if (ex) Object.assign(ex, v); else S.profile.goals.push(v); Store.save(); return { saved: v };
+    }),
+    T('create_nudge', 'Create a nudge on the home screen for a specific, real issue you found in the data.', obj({ text: { type: 'string' }, level: { type: 'string', enum: ['info', 'warn', 'bad', 'good'] } }, ['text']), ({ text, level }) => {
+      const x = { id: 'agent-' + uid(), level: level || 'info', text: guardOutput(text).text, at: new Date().toISOString() }; S.agentNudges.push(x); Store.save(); return x;
+    }),
+    T('add_category_rule', 'Teach a categorisation rule: all payees containing this text get this category from now on.', obj({ merchant_pattern: { type: 'string' }, category: { type: 'string' } }, ['merchant_pattern', 'category']), ({ merchant_pattern, category }) => learnRule(String(merchant_pattern).toUpperCase(), category, 'agent')),
+    T('mark_subscription', "Record the user's answer about a subscription: 'unused' or 'keep'.", obj({ merchant: { type: 'string' }, status: { type: 'string', enum: ['unused', 'keep'] } }, ['merchant', 'status']), ({ merchant, status }) => {
+      const r = model().recurring.find(x => x.merchant.includes(String(merchant).toUpperCase())); if (!r) throw new Error('No recurring payment matches ' + merchant);
+      S.subFlags[r.merchant] = status; Store.save(); return { merchant: title(r.merchant), status, yearlySavingIfCancelled: status === 'unused' ? Math.round(r.yearly) : 0 };
+    })
+  ];
+}
+function agentBrief() {
+  const M = model();
+  return `You are Hisaab, an agentic personal-finance coach for one user in India. You work through tools over their living money model (real transactions, profile, goals, budgets). Today is ${fmtDate(M.asOf)} (last transaction date); data covers ${M.months.map(monthLabel).join(', ')}.
+How you work:
+1. Decide which tools you need, call them, then answer. Never invent numbers: every figure must come from a tool result. Write rupees as ₹ with Indian digit grouping (₹1,25,000).
+2. For any "what if" question, call simulate_what_if; the code does the maths.
+3. You may act on your own when it clearly helps (set_budget, add_goal, create_nudge, add_category_rule, mark_subscription). Say what you did. Never delete anything.
+4. Guardrails: you educate and model scenarios. Never recommend specific stocks, mutual fund schemes, crypto, insurance products or other securities, and never predict returns. Suggest a SEBI-registered investment adviser for product choices.
+5. Be brief and warm: 3 to 6 sentences or a short list, then one concrete next step.`;
+}
+async function askCoach(q, opts = {}) {
+  if (RT.busy || !q.trim()) return;
+  S.chat.push({ role: 'user', content: opts.display || q, prompt: q });
+  RT.tab = 'coach'; render();
+  const g = guardInput(q);
+  if (g) { trace('guard', g.kind === 'securities' ? 'Blocked: request for specific securities advice. Responding with education instead.' : 'Distress detected. Responding with support and a helpline instead of finance advice.'); S.chat.push({ role: 'assistant', content: g.reply, guard: true }); Store.save(); render(); return; }
+  if (!AI.on) { S.chat.push({ role: 'assistant', content: 'The AI coach is off here. Open this app inside Claude, or add an Anthropic API key in Settings. Everything else (import, rules, subscriptions, what-if, nudges) still works without AI.' }); render(); return; }
+  if (!S.txns.length) { S.chat.push({ role: 'assistant', content: 'Import a statement or load the demo data first, so I have real numbers to work with.' }); render(); return; }
+  RT.busy = true; const live = { role: 'assistant', content: '', live: true }; S.chat.push(live); render();
+  trace('plan', 'Coach received: "' + q.slice(0, 120) + '". The model will choose tools.');
+  try {
+    const hist = S.chat.filter(m => !m.live && !m.guard).slice(-7).map(m => ({ role: m.role, content: m.prompt || m.content }));
+    if (hist.length && hist[hist.length - 1].role === 'user') hist[hist.length - 1] = { role: 'user', content: agentBrief() + '\n\nUSER: ' + hist[hist.length - 1].content };
+    while (hist.length && hist[0].role !== 'user') hist.shift();
+    let text = await AI.agent(hist, toolDefs(), t => { live.content = t; const el = $('#liveMsg'); if (el) el.textContent = t || 'Thinking…'; });
+    const go = guardOutput(text || '');
+    if (go.blocked) trace('guard', 'Removed a specific security from the answer.');
+    live.content = go.text || '(no answer)'; delete live.live;
+    trace('final', 'Answer delivered.');
+  } catch (e) {
+    live.content = e.code === 'rate_limited' ? 'I am being rate-limited. Please wait a minute and try again.' : e.code === 'not_granted' ? 'AI access was not granted for this page.' : 'Something went wrong: ' + (e.message || e); delete live.live;
+    trace('error', e.message || String(e));
+  }
+  RT.busy = false; Store.save(); render();
+}
+async function runCheckup() {
+  trace('plan', 'Autonomous monthly check-up started: review latest month → recurring payments → goals → act (nudges/budgets) → report.');
+  await askCoach('Run my monthly check-up on your own: look at the latest month against budgets and averages, check recurring payments and goals, then create up to 3 nudges for real issues you find and adjust any budget that is clearly unrealistic. Finish with a short summary of what you found and every action you took.', { display: 'Run my monthly check-up (autonomous)' });
+}
+
+/* ---------- learning from corrections ---------- */
+function learnRule(pattern, category, by) {
+  const c = CATS.find(x => x.toLowerCase() === String(category).toLowerCase()); if (!c) throw new Error('Unknown category ' + category);
+  let r = S.rules.find(x => x.pattern === pattern);
+  if (r) r.category = c; else { r = { id: uid(), pattern, category: c, by, at: new Date().toISOString(), hits: 0 }; S.rules.push(r); }
+  let n = 0; for (const t of S.txns) if (t.merchant.includes(pattern) && t.catSource !== 'user') { t.category = c; t.catSource = 'learned'; t.needsReview = false; n++; }
+  r.hits = (r.hits || 0) + n; Store.save();
+  trace('action', `Learned rule: payee contains "${pattern}" → ${c}. Re-categorised ${n} past transaction(s); future imports will use it.`);
+  return { pattern, category: c, updatedPast: n };
+}
+
+/* ---------- monthly review: code computes facts, the model writes, code verifies every figure ---------- */
+function reviewFacts(k) {
+  const M = model(); const cur = M.catByMonth[k] || {}; const prevK = addMonths(k, -1); const prev = M.catByMonth[prevK] || null;
+  const income = cur['Income'] || 0; const spend = sum(Object.entries(cur).filter(([c]) => !NOT_SPEND.has(c)).map(([, v]) => v));
+  const prevSpend = prev ? sum(Object.entries(prev).filter(([c]) => !NOT_SPEND.has(c)).map(([, v]) => v)) : null;
+  const top = Object.entries(cur).filter(([c]) => !NOT_SPEND.has(c)).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([c, v]) => ({ category: c, spent: Math.round(v), budget: S.profile.budgets[c] || null, prevMonth: prev ? Math.round(prev[c] || 0) : null }));
+  const subs = M.recurring.filter(r => r.kind === 'subscription');
+  return { month: monthLabel(k), partial: k === M.latest && +M.asOf.slice(8) < daysIn(k) - 2, income: Math.round(income), spend: Math.round(spend), saved: Math.round(income - spend), savingsRatePct: income ? Math.round((income - spend) / income * 100) : 0,
+    invested: Math.round(cur['Investments'] || 0), prevMonth: prev ? monthLabel(prevK) : null, prevSpend: prevSpend != null ? Math.round(prevSpend) : null, topCategories: top,
+    subscriptionsMonthly: Math.round(sum(subs.map(r => r.monthly))), subscriptionAlerts: subs.flatMap(r => r.alerts.map(a => a.text)),
+    goals: M.goals.map(g => ({ name: g.name, target: g.target, saved: g.saved, neededPerMonth: Math.round(g.required), onTrack: g.onTrack })), emergencyMonths: +M.emergency.months.toFixed(1) };
+}
+function collectNumbers(o, out = []) { if (typeof o === 'number') out.push(o); else if (o && typeof o === 'object') for (const v of Object.values(o)) collectNumbers(v, out); else if (typeof o === 'string') (o.match(/[\d,]+(\.\d+)?/g) || []).forEach(x => { const v = parseFloat(x.replace(/,/g, '')); if (Number.isFinite(v)) out.push(v); }); return out; }
+function verifyNumbers(text, facts) {
+  const allowed = collectNumbers(facts); const derived = []; const pcts = [facts.savingsRatePct];
+  const d = (a, b) => { if (a != null && b != null) { derived.push(Math.abs(a - b)); if (b) pcts.push(Math.abs((a / b - 1) * 100)); } };
+  d(facts.spend, facts.prevSpend); d(facts.income, facts.spend);
+  for (const c of facts.topCategories) { d(c.spent, c.prevMonth); d(c.spent, c.budget); }
+  derived.push(facts.subscriptionsMonthly * 12);
+  for (const g of facts.goals) derived.push(Math.max(0, g.target - g.saved));
+  const pool = allowed.concat(derived);
+  const found = []; const re = /₹\s?[\d,]+(?:\.\d+)?|\b\d[\d,]*(?:\.\d+)?\s?%/g; let m;
+  while ((m = re.exec(text))) {
+    const raw = m[0]; const v = parseFloat(raw.replace(/[₹,%\s]/g, '')); if (!Number.isFinite(v)) continue;
+    const ok = raw.includes('%') ? pcts.concat(allowed.filter(a => a <= 100)).some(a => Math.abs(a - v) <= 1) : pool.some(a => Math.abs(a - v) <= Math.max(1, Math.abs(a) * 0.002));
+    found.push({ raw, ok, index: m.index });
+  }
+  return found;
+}
+async function generateReview(k) {
+  if (RT.busy) return; RT.busy = true; render();
+  const facts = reviewFacts(k);
+  trace('plan', `Monthly review for ${facts.month}: code computes the facts, the model writes the narrative, then code checks every ₹ and % against the facts.`);
+  trace('result', 'Facts computed', facts);
+  let text = '';
+  if (AI.on) {
+    try {
+      text = await AI.text(`Write a monthly money review for an Indian user, in plain friendly English, 150-220 words.
+Use ONLY numbers that appear in FACTS (you may also state a difference between two of them). Write rupees as ₹ with Indian digit grouping, no abbreviations like "k" or "L".
+Structure: a one-line headline; "What went well" (2 bullets); "What to watch" (2 bullets); "Next month" (3 short actions).
+Do not recommend specific stocks, funds or other securities.${facts.partial ? ' The month is not over yet; say so.' : ''}
+FACTS: ${JSON.stringify(facts)}`);
+      text = guardOutput(text).text;
+    } catch (e) { trace('error', 'Review writing failed: ' + e.message); }
+  }
+  if (!text) text = templateReview(facts);
+  const checks = verifyNumbers(text, facts);
+  const bad = checks.filter(c => !c.ok);
+  trace(bad.length ? 'guard' : 'result', bad.length ? `Hallucination check: ${bad.length} figure(s) not found in the facts and highlighted.` : `Hallucination check passed: all ${checks.length} figure(s) match the computed facts.`, bad.map(b => b.raw));
+  S.reviews[k] = { text, facts, checks, at: new Date().toISOString(), by: AI.on ? 'ai' : 'template' };
+  RT.busy = false; Store.save(); render();
+}
+function templateReview(f) {
+  const t = f.topCategories.slice(0, 3).map(c => `${c.category} ${inr(c.spent)}`).join(', ');
+  return `${f.month}: you saved ${inr(f.saved)} (${f.savingsRatePct}% of income).\n\nWhat went well\n• Income of ${inr(f.income)} arrived as expected.\n• You invested ${inr(f.invested)}.\n\nWhat to watch\n• Biggest spends: ${t}.\n• Subscriptions cost ${inr(f.subscriptionsMonthly)} a month.\n\nNext month\n• Review your top category budget.\n• Check subscription alerts.\n• Keep building your emergency fund.`;
+}
+
+
+/* ============================================================
+   FUTURE YOU: two 2031 selves projected by code, voiced by AI
+   (Hershfield et al. 2011: meeting your future self increases saving)
+   ============================================================ */
+function futurePlanChanges() {
+  const w = RT.whatif;
+  const cancel = new Set(Object.entries(S.subFlags).filter(([, v]) => v === 'unused').map(([k]) => k));
+  const any = Object.values(w.cuts).some(v => v) || w.rentDelta || w.incomePct || Object.values(w.cancel).some(v => v);
+  if (any) { for (const [m, v] of Object.entries(w.cancel)) if (v) cancel.add(m); return { source: 'your What-if settings', cuts: Object.assign({}, w.cuts), rentDelta: w.rentDelta, incomePct: w.incomePct, cancel: [...cancel] }; }
+  return { source: 'a starter plan', cuts: { 'Food delivery': 30, 'Dining out': 20 }, rentDelta: 0, incomePct: 0, cancel: [...cancel] };
+}
+const FUT = { years: 5, incomeGrowth: 0.07, costGrowth: 0.05 };
+function projectFuture(kind, M) {
+  M = M || model(); const N = FUT.years * 12; const k = M.latest;
+  const cat = Object.assign({}, M.spendByCat); let income = M.income; const notes = [];
+  const day = +M.asOf.slice(8), dim = daysIn(k), cur = M.catByMonth[k] || {};
+  const cnt = {}; for (const t of S.txns) if (monthKey(t.date) === k && t.dir === 'debit') cnt[t.category] = (cnt[t.category] || 0) + 1;
+  if (kind === 'drift') {
+    for (const c of VARIABLE) if ((cnt[c] || 0) >= 6 && cur[c]) { const pace = cur[c] / day * dim; if (pace > (cat[c] || 0) * 1.1) { notes.push(`${c} stays at this month's pace: ${inr(pace)} a month instead of ${inr(cat[c] || 0)}`); cat[c] = pace; } }
+    const kept = M.recurring.filter(r => r.flag === 'unused'); if (kept.length) notes.push('Keeps paying for ' + kept.map(r => title(r.merchant)).join(', ') + ' without using it');
+    if (!notes.length) notes.push('Spending stays at your recent average');
+  } else {
+    const p = futurePlanChanges(); notes.push('Built from ' + p.source);
+    for (const [c, v] of Object.entries(p.cuts)) if (v && cat[c]) { notes.push(`${c} ${v > 0 ? '−' : '+'}${Math.abs(v)}% (${inr(cat[c])} → ${inr(cat[c] * (1 - v / 100))} a month)`); cat[c] *= 1 - v / 100; }
+    if (p.rentDelta) { notes.push(`Rent ${p.rentDelta > 0 ? '+' : '−'}${inr(Math.abs(p.rentDelta))} a month`); cat['Rent'] = (cat['Rent'] || 0) + p.rentDelta; }
+    if (p.incomePct) { notes.push(`Income ${p.incomePct > 0 ? '+' : ''}${p.incomePct}%`); income *= 1 + p.incomePct / 100; }
+    for (const m of p.cancel) { const r = M.recurring.find(x => x.merchant === m); if (r) { cat[r.category] = Math.max(0, (cat[r.category] || 0) - r.monthly); notes.push(`Cancels ${title(m)} (${inr(r.monthly)} a month)`); } }
+  }
+  const sip = M.invest || 0, spend0 = sum(Object.values(cat));
+  const goals = M.goals.map(g => ({ name: g.name, target: g.target, saved: g.saved, by: g.by, auto: !!g.auto, reached: g.saved >= g.target ? k : null }));
+  let net = (+S.profile.emergencyFund || 0) + sum(S.profile.goals.map(g => +g.saved || 0)), invested = 0;
+  const tot = { foodDelivery: 0, diningOut: 0, subscriptions: 0 }; const series = [net];
+  for (let m = 1; m <= N; m++) {
+    const y = Math.floor((m - 1) / 12), mk = addMonths(k, m);
+    const inc = income * Math.pow(1 + FUT.incomeGrowth, y), g = Math.pow(1 + FUT.costGrowth, y);
+    const spend = spend0 * g, surplus = inc - spend; let free = surplus - sip;
+    invested += sip; net += surplus;
+    tot.foodDelivery += (cat['Food delivery'] || 0) * g; tot.diningOut += (cat['Dining out'] || 0) * g; tot.subscriptions += (cat['Subscriptions'] || 0) * g;
+    const open = goals.filter(x => !x.reached).sort((a, b) => a.by.localeCompare(b.by));
+    for (const x of open) { if (free <= 0) break; const left = Math.max(1, monthsBetween(addMonths(k, m - 1), x.by.slice(0, 7))); const need = Math.min(x.target - x.saved, Math.max((x.target - x.saved) / left, 0)); const put = Math.min(free, need); x.saved += put; free -= put; }
+    for (const x of open) { if (free <= 0) break; const put = Math.min(free, x.target - x.saved); x.saved += put; free -= put; }
+    for (const x of open) if (!x.reached && x.saved >= x.target - 0.5) { x.reached = mk; if (!x.auto) net -= x.target; }
+    series.push(net);
+  }
+  return { kind, notes, endMonth: addMonths(k, N), income0: Math.round(income), spend0: Math.round(spend0), surplus0: Math.round(income - spend0), freeAfterSIP0: Math.round(income - spend0 - sip),
+    builtUp: Math.round(net), invested: Math.round(invested), totals: { foodDelivery: Math.round(tot.foodDelivery), diningOut: Math.round(tot.diningOut), subscriptions: Math.round(tot.subscriptions) },
+    goals: goals.map(x => ({ name: x.name, target: x.target, by: x.by, reached: x.reached, onTime: !!x.reached && x.reached <= x.by.slice(0, 7) })), series };
+}
+function futureFacts() {
+  const M = model(); const d = projectFuture('drift', M), p = projectFuture('plan', M);
+  const age = +S.profile.age || 27, name = S.profile.name || 'you';
+  const strip = x => ({ assumptions: x.notes, monthlySurplusToday: x.surplus0, freeAfterSIPToday: x.freeAfterSIP0, builtUpBy2031NoReturns: x.builtUp, sipContributed: x.invested,
+    fiveYearTotals: x.totals, goals: x.goals.map(g => ({ name: g.name, target: g.target, wantedBy: g.by.slice(0, 7), reached: g.reached || 'not within 5 years', onTime: g.onTime })) });
+  return { name, ageNow: age, ageThen: age + FUT.years, month: monthLabel(d.endMonth), growthAssumptions: 'income +7% a year, costs +5% a year, no investment returns assumed',
+    drift: strip(d), plan: strip(p), gapBuiltUp: p.builtUp - d.builtUp, gapFoodDelivery: d.totals.foodDelivery - p.totals.foodDelivery, _d: d, _p: p };
+}
+function verifyAgainst(text, facts) {
+  const nums = collectNumbers(JSON.parse(JSON.stringify(facts, (k, v) => k.startsWith('_') || k === 'series' ? undefined : v)));
+  const big = nums.filter(n => n >= 100); const pool = nums.slice();
+  for (const a of big) for (const b of big) if (a !== b) pool.push(Math.abs(a - b));
+  const out = []; const re = /₹\s?[\d,]+(?:\.\d+)?|\b\d[\d,]*(?:\.\d+)?\s?%/g; let m;
+  while ((m = re.exec(text))) { const raw = m[0], v = parseFloat(raw.replace(/[₹,%\s]/g, '')); if (!Number.isFinite(v)) continue;
+    out.push({ raw, ok: raw.includes('%') ? nums.some(a => Math.abs(a - v) <= 1) : pool.some(a => Math.abs(a - v) <= Math.max(1, a * 0.002)) }); }
+  return out;
+}
+async function writeLetters() {
+  if (RT.busy) return; if (!AI.on) { toast('Turn AI on to hear from your future selves'); return; }
+  RT.busy = true; render();
+  const f = futureFacts(); const facts = Object.assign({}, f); delete facts._d; delete facts._p;
+  trace('plan', 'Future You: code projects two 5-year futures from the money model; the model writes a letter from each self using only those numbers; code then checks every figure.');
+  trace('result', 'Projection facts', facts);
+  try {
+    const r = await AI.json(`Write two short letters to ${f.name === 'you' ? 'the user' : f.name}, aged ${f.ageNow}, from two versions of themselves in ${f.month}, aged ${f.ageThen}.
+"drift": the self whose habits drifted as described in drift.assumptions. "plan": the self who stuck with plan.assumptions.
+Rules: first person, warm and honest, never shaming or scary. 70-110 words each. Use ONLY figures that appear in FACTS (or the difference between two of them), written as ₹ with Indian digit grouping, no "lakh" or "k" abbreviations. Mention one concrete everyday trade-off and one goal. Say "assuming no investment returns" once in the plan letter. No stock, fund or crypto names. The drift letter should end with one gentle, specific suggestion; the plan letter with one line of encouragement.
+Return JSON {"drift":"...","plan":"..."}.
+FACTS: ${JSON.stringify(facts)}`, 'default');
+    const letters = { drift: guardOutput(String(r.drift || '')).text, plan: guardOutput(String(r.plan || '')).text };
+    const checks = { drift: verifyAgainst(letters.drift, facts), plan: verifyAgainst(letters.plan, facts) };
+    const bad = [...checks.drift, ...checks.plan].filter(c => !c.ok);
+    trace(bad.length ? 'guard' : 'result', bad.length ? `Figure check: ${bad.length} figure(s) not in the projection, highlighted.` : `Figure check passed: all ${checks.drift.length + checks.plan.length} figures in both letters match the projection.`, bad.map(b => b.raw));
+    S.future = { letters, checks, at: new Date().toISOString(), gap: f.gapBuiltUp };
+  } catch (e) { trace('error', 'Letters failed: ' + (e.message || e)); toast('Could not write the letters'); }
+  RT.busy = false; Store.save(); render();
+}
+const VOICE = { drift: 'rounded', plan: 'airy' };
+async function speakFuture(which) {
+  const t = RT.tts; if (!t || !S.future) return;
+  const L = S.future.letters, nm = S.profile.name || 'you';
+  const lines = which === 'both' ? [{ text: `First, ${nm} from the drift future.`, voice: 'buttery' }, { text: L.drift, voice: VOICE.drift }, { text: `And now, ${nm} from the plan future.`, voice: 'buttery' }, { text: L.plan, voice: VOICE.plan }] : [{ text: L[which], voice: VOICE[which] }];
+  trace('action', 'Reading the letter' + (which === 'both' ? 's' : '') + ' aloud in ' + (which === 'both' ? 'two voices' : 'the ' + which + ' voice') + '.');
+  try { await t.speak(lines.map(l => Object.assign({ language: 'en' }, l))); } catch (e) { if (e && e.code !== 'viewer_stopped') toast(e && e.code === 'rate_limited' ? 'Voice is busy; try again shortly' : 'Voice playback stopped'); }
+}
+async function askFuture(q) {
+  if (RT.busy || !q.trim()) return;
+  const who = RT.futureSelf || 'plan'; S.futureChat = S.futureChat || [];
+  S.futureChat.push({ role: 'user', content: q, self: who }); render();
+  const g = guardInput(q);
+  if (g) { trace('guard', 'Future-self chat: guardrail applied (' + g.kind + ').'); S.futureChat.push({ role: 'assistant', content: g.reply, self: who, guard: true }); Store.save(); render(); return; }
+  if (!AI.on) { S.futureChat.push({ role: 'assistant', content: 'Turn AI on (open in Claude or add a key in Settings) to talk to your future self.', self: who }); render(); return; }
+  RT.busy = true; const live = { role: 'assistant', content: '', self: who, live: true }; S.futureChat.push(live); render();
+  const f = futureFacts(); const nm = f.name === 'you' ? 'the user' : f.name;
+  trace('plan', `Future-self chat: the model speaks as the ${who} self from ${f.month} and must fetch its numbers with tools.`);
+  const base = toolDefs().filter(t => ['get_overview', 'simulate_what_if', 'list_recurring'].includes(t.name));
+  const tool = { name: 'get_future_projection', description: 'The 5-year projection for one future self ("drift" or "plan"): assumptions, money built up by the end (no investment returns), five-year totals for food delivery, dining out and subscriptions, and when each goal is reached.',
+    schema: { type: 'object', properties: { self: { type: 'string', enum: ['drift', 'plan'] } }, required: ['self'] },
+    run: async ({ self }) => { trace('tool', 'get_future_projection', { self }); const x = self === 'drift' ? f.drift : f.plan; trace('result', 'get_future_projection → done', x); return Object.assign({ month: f.month, ageThen: f.ageThen, gapBuiltUpPlanMinusDrift: f.gapBuiltUp }, x); } };
+  const brief = `You are ${nm} speaking from ${f.month}, aged ${f.ageThen}: the "${who}" future self. ${who === 'drift' ? 'Your habits drifted the way get_future_projection("drift") describes.' : 'You stuck with the plan that get_future_projection("plan") describes.'}
+Talk to your younger self (aged ${f.ageNow}) in first person, warmly and honestly. Never shame or frighten. Call get_future_projection first; use only numbers from tools, as ₹ with Indian digit grouping. If they ask "what if", call simulate_what_if and explain how it would change your story. Assume no investment returns and never name stocks, funds or crypto. 3 to 5 sentences.`;
+  try {
+    const hist = S.futureChat.filter(m => !m.live && !m.guard && m.self === who).slice(-6).map(m => ({ role: m.role, content: m.content }));
+    hist[hist.length - 1] = { role: 'user', content: brief + '\n\nYOUNGER SELF ASKS: ' + hist[hist.length - 1].content };
+    while (hist.length && hist[0].role !== 'user') hist.shift();
+    const text = await AI.agent(hist, base.concat([tool]), t => { live.content = t; const el = $('#futLive'); if (el) el.textContent = t || 'Thinking…'; });
+    live.content = guardOutput(text || '').text || '(no answer)'; delete live.live; trace('final', 'Future self answered.');
+    if (RT.autoVoice && RT.tts) RT.tts.speak(live.content, { voice: VOICE[who], language: 'en' }).catch(() => {});
+  } catch (e) { live.content = 'Something went wrong: ' + (e.message || e); delete live.live; trace('error', e.message || String(e)); }
+  RT.busy = false; Store.save(); render();
+}
+function futureChart(d, p) {
+  const W = 620, H = 210, L = 64, R = 16, T = 18, B = 26; const n = d.series.length - 1;
+  const all = d.series.concat(p.series); const mx = Math.max(...all), mn = Math.min(0, ...all);
+  const x = i => L + i * (W - L - R) / n, y = v => T + (mx - v) / (mx - mn || 1) * (H - T - B);
+  const path = a => a.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+  const ticks = [0, 12, 24, 36, 48, 60]; const yt = [0, 0.25, 0.5, 0.75, 1].map(f => mn + (mx - mn) * f);
+  const marks = (pr, col) => pr.goals.filter(g => g.reached).map(g => { const i = monthsBetween(model().latest, g.reached); return i >= 0 && i <= n ? `<circle cx="${x(i)}" cy="${y(pr.series[i])}" r="4" fill="${col}"><title>${esc(g.name)} reached ${monthLabel(g.reached)}</title></circle>` : ''; }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%" role="img" aria-label="Money built up over five years, plan versus drift">
+  ${yt.map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#eef1f5"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end" font-size="10" fill="#7b8696">${inr(round(v, 1000))}</text>`).join('')}
+  ${ticks.map(i => `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#7b8696">${monthLabel(addMonths(model().latest, i)).replace(' 20', " '")}</text>`).join('')}
+  <path d="${path(d.series)}" fill="none" stroke="#d97706" stroke-width="2.5"/><path d="${path(p.series)}" fill="none" stroke="#127a6d" stroke-width="2.5"/>
+  ${marks(d, '#d97706')}${marks(p, '#127a6d')}
+  <text x="${x(n) - 4}" y="${y(p.series[n]) - 8}" text-anchor="end" font-size="11.5" font-weight="700" fill="#0f5b52">Plan: ${inr(p.series[n])}</text>
+  <text x="${x(n) - 4}" y="${y(d.series[n]) + 16}" text-anchor="end" font-size="11.5" font-weight="700" fill="#b45309">Drift: ${inr(d.series[n])}</text></svg>`;
+}
+function avatar(kind, initial, age) {
+  const c = kind === 'plan' ? ['#0f5b52', '#e3f2ef'] : ['#b45309', '#fff4e5'];
+  return `<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="${c[1]}" stroke="${c[0]}" stroke-width="2"/><circle cx="32" cy="25" r="11" fill="${c[0]}" opacity=".85"/><path d="M12 54c4-11 12-16 20-16s16 5 20 16" fill="${c[0]}" opacity=".85"/><path d="M23 19c3-4 15-4 18 0" stroke="#fff" stroke-width="2" fill="none" opacity="${kind === 'plan' ? .2 : .5}"/><text x="32" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${esc(initial)}</text></svg>`;
+}
+function vFuture(M) {
+  if (!S.txns.length) return '<h1>Future you</h1>' + emptyState();
+  const f = futureFacts(), d = f._d, p = f._p; const nm = S.profile.name || 'You'; const ini = (nm[0] || 'Y').toUpperCase();
+  const goalRow = g => `<div class="row small" style="justify-content:space-between;margin:3px 0"><span>${esc(g.name)}</span><span>${g.reached ? (g.onTime ? '<span class="pill g">' : '<span class="pill w">') + monthLabel(g.reached) + '</span>' : '<span class="pill b">not in 5 years</span>'}</span></div>`;
+  const card = (kind, x) => `<div class="card" style="border-top:4px solid ${kind === 'plan' ? 'var(--brand2)' : '#d97706'}">
+    <div class="row">${avatar(kind, ini, f.ageThen)}<div><div class="muted small">${esc(f.month)} · age ${f.ageThen}</div><h2 style="margin:0">${kind === 'plan' ? 'Plan' : 'Drift'} ${esc(nm)}</h2><div class="small muted">${kind === 'plan' ? 'stuck with the plan' : "kept this month's habits"}</div></div></div>
+    <div class="kpi" style="margin:12px 0 6px"><div class="l">Built up by ${esc(f.month)} (no returns assumed)</div><div class="v" style="color:${kind === 'plan' ? 'var(--brand)' : '#b45309'}">${inr(x.builtUp)}</div><div class="s">${inr(x.freeAfterSIP0)} a month free after SIPs today</div></div>
+    ${x.goals.map(goalRow).join('')}
+    <div class="small" style="margin-top:8px">Five years of food delivery: <b>${inr(x.totals.foodDelivery)}</b> · subscriptions: <b>${inr(x.totals.subscriptions)}</b></div>
+    <details style="margin-top:8px"><summary class="small muted">Assumptions</summary><ul class="small" style="margin:6px 0 0 16px;padding:0">${x.notes.map(n => `<li>${esc(n)}</li>`).join('')}<li>Income +7% a year, costs +5% a year; no investment returns assumed</li></ul></details>
+    ${S.future && S.future.letters && S.future.letters[kind] ? letterHTML(kind) : ''}</div>`;
+  const chat = (S.futureChat || []).filter(m => m.self === (RT.futureSelf || 'plan'));
+  return `<h1>Future you</h1><p class="sub">Meet two versions of yourself in ${esc(f.month)}, built from your real transactions. People who meet a vivid future self tend to save more (<a href="https://vhil.stanford.edu/publications/increasing-saving-behavior-through-age-progressed-renderings-future-self" target="_blank" rel="noopener">Hershfield et al., 2011</a>). Code does the projection; AI gives each self a voice.</p>
+  <div class="card row" style="gap:14px"><label class="small">Your name <input type="text" id="fuName" value="${esc(S.profile.name || '')}" placeholder="e.g. Priya" style="width:130px"></label><label class="small">Age now <input type="number" id="fuAge" value="${+S.profile.age || 27}" style="width:80px"></label>
+   <span class="small muted">The plan self uses your What-if settings, or a starter plan if you haven't set any.</span><span style="flex:1"></span>
+   <button class="btn p" data-act="letters" ${RT.busy ? 'disabled' : ''}>${RT.busy ? '<span class="spin"></span> Writing' : S.future ? 'Rewrite their letters' : 'Hear from them'}</button>
+   ${S.future && RT.tts ? '<button class="btn" data-act="speakBoth">Play both voices</button><button class="btn s ghost" data-act="stopVoice">Stop</button>' : ''}</div>
+  <div class="card" style="background:linear-gradient(90deg,#fff4e5,#e3f2ef);border:0"><b>The gap:</b> Plan ${esc(nm)} has built <b>${inr(f.gapBuiltUp)}</b> more than Drift ${esc(nm)} by ${esc(f.month)}, and spent <b>${inr(f.gapFoodDelivery)}</b> less on food delivery along the way.</div>
+  <div class="grid g2">${card('drift', d)}${card('plan', p)}</div>
+  <div class="card"><h2>Five years, two paths</h2><div class="legend"><span><i style="background:#127a6d"></i>Plan</span><span><i style="background:#d97706"></i>Drift</span><span>● goal reached (and spent)</span></div>${futureChart(d, p)}</div>
+  <div class="card"><div class="row" style="justify-content:space-between"><h2>Ask your future self</h2><div class="row small"><button class="btn s ${RT.futureSelf !== 'drift' ? 'p' : ''}" data-act="pickSelf" data-v="plan">Plan ${esc(nm)}</button><button class="btn s ${RT.futureSelf === 'drift' ? 'p' : ''}" data-act="pickSelf" data-v="drift">Drift ${esc(nm)}</button>${RT.tts ? `<label><input type="checkbox" id="autoVoice" ${RT.autoVoice ? 'checked' : ''}> speak answers</label>` : ''}</div></div>
+   <div class="chat" style="max-height:40vh">${chat.length ? chat.map(m => `<div class="msg ${m.role === 'user' ? 'u' : 'a'} ${m.guard ? 'guard' : ''}" ${m.live ? 'id="futLive"' : ''}>${m.guard ? '<span class="pill b">guardrail</span>\n' : ''}${esc(m.content || (m.live ? 'Thinking…' : ''))}</div>`).join('') : `<p class="muted small">Try: "Did we make the Goa trip?" · "What was the hardest habit to change?" · "What if I also cut shopping by 20%?"</p>`}</div>
+   <form class="row" id="futForm" style="margin-top:10px"><input type="text" id="fuIn" placeholder="Ask ${RT.futureSelf === 'drift' ? 'Drift' : 'Plan'} ${esc(nm)}…" autocomplete="off" style="flex:1">${RT.dict ? `<button type="button" class="btn" id="micBtn" data-act="mic">${RT.listening ? 'Stop' : 'Speak'}</button>` : ''}<button class="btn p" ${RT.busy ? 'disabled' : ''}>Ask</button></form></div>`;
+}
+function letterHTML(kind) {
+  const L = S.future.letters[kind], ch = (S.future.checks || {})[kind] || []; let h = esc(L);
+  for (const b of [...new Set(ch.filter(c => !c.ok).map(c => c.raw))]) h = h.split(esc(b)).join(`<mark class="unv" title="Not in the projection">${esc(b)}</mark>`);
+  const bad = ch.filter(c => !c.ok).length;
+  return `<div style="margin-top:12px;padding:12px;border-radius:8px;background:${kind === 'plan' ? '#f3faf8' : '#fffaf0'}"><div class="row small" style="justify-content:space-between"><b>A letter from ${kind} you</b>${RT.tts ? `<button class="btn s" data-act="speakOne" data-v="${kind}">Play</button>` : ''}</div><div class="review" style="margin-top:6px">${h}</div><div class="small" style="margin-top:6px;color:${bad ? 'var(--warn)' : 'var(--good)'}">${bad ? bad + ' figure(s) not found in the projection' : 'All ' + ch.length + ' figures match the projection'}</div></div>`;
+}
+
+/* ============================================================
+   RENDERING
+   ============================================================ */
+const TABS = [['home', 'Home'], ['future', 'Future you'], ['import', 'Import'], ['txns', 'Transactions'], ['subs', 'Subscriptions'], ['plan', 'Profile & goals'], ['whatif', 'What-if'], ['review', 'Monthly review'], ['coach', 'Coach']];
+function renderChips() {
+  const a = $('#aiChip'), s = $('#storeChip'); if (!a) return;
+  const am = { checking: ['wait', 'AI: checking'], claude: ['on', 'AI: Claude'], anthropic: ['on', 'AI: your API key'], off: ['off', 'AI: off (rules only)'] }[AI.mode];
+  a.innerHTML = `<span class="dot ${am[0]}"></span>${am[1]}`;
+  const sm = { cloud: ['on', 'Saved to your account'], browser: ['on', 'Saved in this browser'], memory: ['off', 'Not saved (session only)'] }[Store.mode] || ['wait', 'Storage: checking'];
+  s.innerHTML = `<span class="dot ${sm[0]}"></span>${sm[1]}`;
+}
+function render() {
+  const M = model();
+  const reviewN = S.txns.filter(t => t.needsReview).length;
+  $('#nav').innerHTML = TABS.map(([id, l], i) => `<button class="${RT.tab === id ? 'active' : ''}" data-tab="${id}"><span class="num">${i + 1}</span>${l}${id === 'txns' && reviewN ? `<span class="badge">${reviewN}</span>` : ''}${id === 'home' && M.nudges.length ? `<span class="badge">${M.nudges.length}</span>` : ''}</button>`).join('');
+  const views = { home: vHome, future: vFuture, import: vImport, txns: vTxns, subs: vSubs, plan: vPlan, whatif: vWhatIf, review: vReview, coach: vCoach };
+  $('#main').innerHTML = views[RT.tab](M);
+  renderChips();
+  const cb = $('#chatBox'); if (cb) cb.scrollTop = cb.scrollHeight;
+}
+const emptyState = () => `<div class="card empty"><h2>No data yet</h2><p>Import a bank statement or bank SMS, or load the demo account to see the agent at work.</p><div class="row" style="justify-content:center"><button class="btn p" data-act="demo">Load demo data (3 months + November SMS)</button><button class="btn" data-tab="import">Import my own</button></div></div>`;
+function kpi(l, v, s) { return `<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s || ''}</div></div>`; }
+function nudgeHTML(n) { const lbl = { warn: 'Watch', bad: 'Act', info: 'FYI', good: 'Nice' }[n.level] || 'FYI'; return `<div class="nudge ${n.level}"><span class="ic">${lbl}</span><div>${esc(n.text)}${n.agent ? ' <span class="pill i">by agent</span>' : ''}</div><button class="btn s ghost x" data-act="dismiss" data-id="${esc(n.id)}" title="Dismiss">✕</button></div>`; }
+function vHome(M) {
+  if (!S.txns.length) return `<h1>Your money, as a living model</h1><p class="sub">Hisaab reads messy bank data, learns your corrections and coaches you, with every agent step shown on the right.</p>` + emptyState();
+  const k = M.latest; const cur = M.catByMonth[k] || {}; const day = +M.asOf.slice(8), dim = daysIn(k);
+  const bars = VARIABLE.filter(c => S.profile.budgets[c] || cur[c]).map(c => {
+    const b = S.profile.budgets[c] || 0, sp = cur[c] || 0; const w = b ? Math.min(100, sp / b * 100) : 0; const pace = day / dim * 100;
+    const cls = b && sp > b ? 'b' : b && sp > b * pace / 100 * 1.1 ? 'w' : '';
+    return `<div style="margin:9px 0"><div class="row small" style="justify-content:space-between"><span>${c}</span><span class="muted">${inr(sp)} of ${b ? inr(b) : 'no budget'}</span></div><div class="bar"><i class="${cls}" style="width:${w}%"></i>${b ? `<span class="pace" style="left:${pace}%" title="where you should be today"></span>` : ''}</div></div>`;
+  }).join('');
+  const fx = futureFacts();
+  return `<h1>Home</h1><p class="sub">As of ${fmtDate(M.asOf)} · based on ${M.full.length} full month(s): ${M.full.map(monthLabel).join(', ')}</p>
+  <div class="card row" style="background:linear-gradient(90deg,#fff4e5,#e3f2ef);border:0"><div style="flex:1"><b>Meet yourself in ${esc(fx.month)}.</b> If this month's habits stick, you'll have built <b>${inr(fx.gapBuiltUp)}</b> less than if you follow the plan.</div><button class="btn p" data-tab="future">Meet your future selves</button></div>
+  <div class="grid g4">${kpi('Monthly income', inr(M.income), S.profile.incomeOverride ? 'set by you' : 'detected from salary credits')}${kpi('Average monthly spend', inr(M.spend), 'excludes investments')}${kpi('Monthly surplus', inr(M.surplus), 'savings rate ' + pct(M.rate) + ' · ' + inr(M.free) + ' free after SIPs')}${kpi('Emergency fund', M.emergency.months.toFixed(1) + ' months', inr(M.emergency.fund) + ' of ' + inr(M.emergency.target) + ' target')}</div>
+  <div class="grid g2">
+   <div class="card"><div class="row" style="justify-content:space-between"><h2>Nudges</h2><button class="btn s p" data-act="checkup" ${RT.busy ? 'disabled' : ''}>Run agent check-up</button></div>${M.nudges.length ? M.nudges.map(nudgeHTML).join('') : '<p class="muted">All on track.</p>'}</div>
+   <div class="card"><h2>${monthLabel(k)} so far vs budget</h2><div class="legend"><span><i style="background:var(--brand2)"></i>on pace</span><span><i style="background:#f79009"></i>ahead of pace</span><span><i style="background:#f04438"></i>over budget</span><span>│ today's pace</span></div>${bars}</div>
+  </div>${howItWorks()}`;
+}
+function howItWorks() {
+  return `<div class="card"><h2>How Hisaab works: AI only where it earns its place</h2><table>
+  <tr><th>Job</th><th>Done by</th><th>Why</th></tr>
+  <tr><td>Reading known bank formats (HDFC-style CSV, UPI/card/NEFT SMS)</td><td><span class="pill n">rules</span></td><td>Fast, free, exact</td></tr>
+  <tr><td>Reading unknown layouts and messy lines</td><td><span class="pill i">AI</span></td><td>Unstructured text; masked first</td></tr>
+  <tr><td>Categorising known merchants · your learned rules</td><td><span class="pill n">rules</span> <span class="pill g">learned</span></td><td>Your corrections become rules</td></tr>
+  <tr><td>Categorising unknown payees (e.g. a person paid ₹22,000 every 3rd)</td><td><span class="pill i">AI</span></td><td>Needs judgement from amount and timing</td></tr>
+  <tr><td>Subscriptions, budgets, nudges, what-if maths, goal dates</td><td><span class="pill n">code</span></td><td>Numbers must be exact and repeatable</td></tr>
+  <tr><td>Coach: deciding which tools to use, acting, explaining</td><td><span class="pill i">AI agent</span></td><td>Open-ended questions, multi-step plans</td></tr>
+  <tr><td>Monthly review narrative</td><td><span class="pill i">AI</span> + <span class="pill n">code check</span></td><td>Every ₹ and % is verified against the facts</td></tr>
+  </table><p class="small muted" style="margin-top:8px">Guardrails: personal data masked before any AI call · no specific stocks, funds or crypto · distress messages get a helpline, not advice · the agent can add budgets, goals, rules and nudges but never deletes anything.</p></div>`;
+}
+function vImport() {
+  return `<h1>Import</h1><p class="sub">Messy formats are fine. Rules handle the common Indian bank formats; only lines they can't read go to the model, after account numbers, phone numbers and UPI IDs are masked.</p>
+  <div class="grid g2">
+   <div class="card"><h2>Bank statement file</h2><div class="drop" id="drop">Drop a CSV or PDF statement here<br><br><label class="btn">Choose file<input type="file" id="file" accept=".csv,.txt,.pdf" hidden></label></div><p class="small muted">CSV: any bank layout (the agent maps unknown columns). PDF: text-based statements.</p></div>
+   <div class="card"><h2>Bank SMS</h2><textarea id="smsIn" placeholder="Paste transaction SMS, one per line. OTPs and offers are ignored automatically."></textarea><div class="row" style="margin-top:8px"><button class="btn p" data-act="importSms" ${RT.busy ? 'disabled' : ''}>Read SMS</button><button class="btn s" data-act="fillSms">Paste sample November SMS</button></div></div>
+  </div>
+  <div class="card"><h2>Any statement text</h2><textarea id="txtIn" placeholder="Paste rows copied from a PDF or net-banking page."></textarea><div class="row" style="margin-top:8px"><button class="btn" data-act="importText" ${RT.busy ? 'disabled' : ''}>Read text</button></div></div>
+  <div class="card"><h2>Demo account</h2><p class="small">Priya, 27, Bengaluru: an HDFC savings-account CSV for Aug–Oct 2026 plus bank SMS for 1–20 November.</p><div class="row"><button class="btn p" data-act="demo" ${RT.busy ? 'disabled' : ''}>Load demo data</button><button class="btn" data-act="reset">Reset all data</button></div></div>
+  ${S.log.length ? `<div class="card"><h2>Import history</h2><table><tr><th>When</th><th>What</th><th class="n">Added</th></tr>${S.log.slice().reverse().map(l => `<tr><td>${new Date(l.at).toLocaleString('en-IN')}</td><td>${esc(l.label)}</td><td class="n">${l.added}</td></tr>`).join('')}</table></div>` : ''}`;
+}
+function vTxns(M) {
+  if (!S.txns.length) return '<h1>Transactions</h1>' + emptyState();
+  const f = RT.filter; let rows = S.txns.slice().reverse();
+  if (f.month !== 'all') rows = rows.filter(t => t.date.startsWith(f.month));
+  if (f.cat !== 'all') rows = rows.filter(t => t.category === f.cat);
+  if (f.review) rows = rows.filter(t => t.needsReview);
+  if (f.q) rows = rows.filter(t => (t.merchant + ' ' + t.desc).toLowerCase().includes(f.q.toLowerCase()));
+  const src = { rule: '<span class="pill n">rule</span>', learned: '<span class="pill g">learned</span>', ai: '<span class="pill i">AI</span>', user: '<span class="pill g">you</span>', default: '<span class="pill w">default</span>' };
+  const p = RT.pending;
+  return `<h1>Transactions</h1><p class="sub">Change any category and Hisaab offers to learn a rule, so the fix applies to past and future transactions.</p>
+  ${p ? `<div class="card" style="border-color:var(--brand)"><b>Learn from this correction?</b><p class="small">Always categorise payees containing <b>${esc(p.pattern)}</b> as <b>${esc(p.category)}</b>? This updates ${S.txns.filter(t => t.merchant.includes(p.pattern) && t.id !== p.id).length} other transaction(s) and every future import.</p><div class="row"><input type="text" id="rulePat" value="${esc(p.pattern)}" style="max-width:260px"><button class="btn p" data-act="learn">Yes, learn the rule</button><button class="btn" data-act="noLearn">Just this one</button></div></div>` : ''}
+  <div class="card"><div class="row" style="margin-bottom:10px">
+   <select id="fMonth" style="width:auto"><option value="all">All months</option>${M.months.map(k => `<option value="${k}" ${f.month === k ? 'selected' : ''}>${monthLabel(k)}</option>`).join('')}</select>
+   <select id="fCat" style="width:auto"><option value="all">All categories</option>${CATS.map(c => `<option ${f.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
+   <input type="text" id="fQ" placeholder="Search payee" value="${esc(f.q)}" style="max-width:200px">
+   <label class="small"><input type="checkbox" id="fRev" ${f.review ? 'checked' : ''}> Needs review only (${S.txns.filter(t => t.needsReview).length})</label>
+   <span class="muted small" style="margin-left:auto">${rows.length} rows</span></div>
+  <div style="overflow:auto"><table><tr><th>Date</th><th>Payee</th><th>Category</th><th>Source</th><th class="n">Amount</th></tr>
+  ${rows.slice(0, 400).map(t => `<tr class="${t.needsReview ? 'flag' : ''}"><td>${fmtDate(t.date)}</td><td><b>${esc(title(t.merchant))}</b><div class="small muted" title="${esc(t.desc)}">${esc(t.desc.slice(0, 70))}</div></td>
+   <td><select class="cat" data-id="${t.id}">${CATS.map(c => `<option ${c === t.category ? 'selected' : ''}>${c}</option>`).join('')}</select>${t.needsReview ? ' <span class="pill w" title="' + esc(t.reason || 'low confidence') + '">check</span>' : ''}</td>
+   <td>${src[t.catSource] || ''}${t.source && t.source.includes('ai') ? ' <span class="pill i">AI-read</span>' : ''} <span class="small muted">${esc(t.source)}</span></td>
+   <td class="n" style="color:${t.dir === 'credit' ? 'var(--good)' : 'inherit'}">${t.dir === 'credit' ? '+' : ''}${inr(t.amount, t.amount % 1 ? 2 : 0)}</td></tr>`).join('')}</table></div></div>
+  <div class="card"><h2>Learned rules (${S.rules.length})</h2>${S.rules.length ? `<table><tr><th>Payee contains</th><th>Category</th><th>Learned from</th><th class="n">Applied</th><th></th></tr>${S.rules.map(r => `<tr><td><b>${esc(r.pattern)}</b></td><td>${esc(r.category)}</td><td>${r.by === 'agent' ? 'agent' : 'your correction'}</td><td class="n">${r.hits || 0}</td><td class="n"><button class="btn s" data-act="delRule" data-id="${r.id}">Remove</button></td></tr>`).join('')}</table>` : '<p class="muted small">None yet. Correct a category above to teach one.</p>'}</div>`;
+}
+function vSubs(M) {
+  if (!S.txns.length) return '<h1>Subscriptions</h1>' + emptyState();
+  const subs = M.recurring; const cancel = subs.filter(r => r.flag === 'unused');
+  const card = r => `<div class="card"><div class="row" style="justify-content:space-between"><div><b>${esc(title(r.merchant))}</b> <span class="pill n">${r.category}</span> <span class="pill n">${r.cadence}</span>${r.flag === 'keep' ? ' <span class="pill g">using</span>' : r.flag === 'unused' ? ' <span class="pill b">not using</span>' : ''}</div><div style="text-align:right"><b>${inr(r.amount)}</b><div class="small muted">${inr(r.yearly)}/year · next ~${fmtDate(r.next)}</div></div></div>
+   ${r.alerts.map(a => `<div class="nudge ${a.level}" style="margin:8px 0 0"><span class="ic">${a.type === 'price' ? 'Price' : a.type === 'overlap' ? 'Overlap' : a.type === 'unused' ? 'Unused' : 'Missed'}</span><div class="small">${esc(a.text)}</div></div>`).join('')}
+   ${r.kind === 'subscription' ? `<div class="row small" style="margin-top:8px"><span class="muted">Bank data can't see usage, so the agent asks:</span> Do you still use it? <button class="btn s" data-act="subFlag" data-m="${esc(r.merchant)}" data-v="keep">Yes</button><button class="btn s" data-act="subFlag" data-m="${esc(r.merchant)}" data-v="unused">No</button></div>` : ''}</div>`;
+  return `<h1>Subscriptions & recurring payments</h1><p class="sub">Detected from payment timing and amounts: no AI needed. Alerts fire when a price changes, apps overlap, a payment goes missing, or you say you don't use one.</p>
+  <div class="grid g3">${kpi('Recurring payments', subs.length, inr(sum(subs.map(r => r.monthly))) + '/month')}${kpi('Subscriptions', inr(sum(subs.filter(r => r.kind === 'subscription').map(r => r.monthly))) + '/mo', inr(sum(subs.filter(r => r.kind === 'subscription').map(r => r.yearly))) + ' a year')}${kpi('Cancel list saves', inr(sum(cancel.map(r => r.yearly))), cancel.length + ' marked unused')}</div>
+  <h2>Subscriptions</h2>${subs.filter(r => r.kind === 'subscription').map(card).join('') || '<p class="muted">None found.</p>'}
+  <h2 style="margin-top:18px">Rent, bills, investments and other regular payments</h2>${subs.filter(r => r.kind !== 'subscription').map(card).join('')}`;
+}
+function vPlan(M) {
+  if (!S.txns.length) return '<h1>Profile & goals</h1>' + emptyState();
+  const p = S.profile;
+  return `<h1>Profile & goals</h1><p class="sub">Your persistent financial profile. Detected values update with every import; anything you type here wins.</p>
+  <div class="grid g2">
+   <div class="card"><h2>Profile</h2><table>
+    <tr><td>Monthly income</td><td class="n">${inr(M.incomeDetected)} detected</td><td style="width:150px"><input type="number" id="incOv" placeholder="override" value="${p.incomeOverride || ''}"></td></tr>
+    <tr><td>Fixed costs (rent, bills, subscriptions)</td><td class="n">${inr(M.fixed)}/month</td><td></td></tr>
+    <tr><td>Essential costs</td><td class="n">${inr(M.essential)}/month</td><td></td></tr>
+    <tr><td>Investing (SIPs)</td><td class="n">${inr(M.invest)}/month</td><td></td></tr>
+    <tr><td>Emergency fund (liquid savings)</td><td class="n">${M.emergency.months.toFixed(1)} months</td><td><input type="number" id="efIn" value="${p.emergencyFund}"></td></tr>
+    <tr><td>Emergency target (months of essentials)</td><td class="n">${inr(M.emergency.target)}</td><td><input type="number" id="efM" value="${p.emergencyMonths}"></td></tr></table>
+    <p class="small muted">Savings rate ${pct(M.rate)} · surplus ${inr(M.surplus)}/month (SIPs counted as saving, not spending).</p></div>
+   <div class="card"><h2>Goals</h2><table><tr><th>Goal</th><th class="n">Target</th><th class="n">Saved</th><th>By</th><th class="n">Needs/mo</th><th>Status</th><th></th></tr>
+    ${M.goals.map(g => `<tr><td><b>${esc(g.name)}</b></td><td class="n">${inr(g.target)}</td><td class="n">${inr(g.saved)}</td><td>${fmtDate(g.by)}</td><td class="n">${inr(g.required)}</td><td>${g.remaining <= 0 ? '<span class="pill g">done</span>' : g.onTrack ? '<span class="pill g">on track</span>' : `<span class="pill w">late: ${g.eta ? monthLabel(g.eta) : 'never'}</span>`}</td><td>${g.auto ? '<span class="small muted">auto</span>' : `<button class="btn s ghost" data-act="delGoal" data-id="${g.id}">✕</button>`}</td></tr>`).join('')}</table>
+    <div class="row" style="margin-top:10px"><input type="text" id="gName" placeholder="Goal" style="max-width:130px"><input type="number" id="gT" placeholder="Target ₹" style="max-width:110px"><input type="number" id="gS" placeholder="Saved ₹" style="max-width:100px"><input type="date" id="gBy" style="max-width:150px"><button class="btn p s" data-act="addGoal">Add</button></div>
+    <p class="small muted">Money left after SIPs funds goals in deadline order, soonest first; anything spare goes to the last goal.</p></div>
+  </div>
+  <div class="card"><h2>Monthly budgets</h2><p class="small muted">Suggested from your average. Nudges fire when spending runs ahead of the month's pace.</p><table><tr><th>Category</th><th class="n">Average</th><th class="n">This month</th><th style="width:160px">Budget</th></tr>
+  ${VARIABLE.filter(c => M.avgCat[c] || S.profile.budgets[c]).map(c => `<tr><td>${c}</td><td class="n">${inr(M.avgCat[c] || 0)}</td><td class="n">${inr((M.catByMonth[M.latest] || {})[c] || 0)}</td><td><input type="number" class="bud" data-c="${c}" value="${S.profile.budgets[c] || ''}"></td></tr>`).join('')}</table></div>`;
+}
+function vWhatIf(M) {
+  if (!S.txns.length) return '<h1>What-if planner</h1>' + emptyState();
+  const w = RT.whatif; const changes = [];
+  for (const [c, v] of Object.entries(w.cuts)) if (v) changes.push({ kind: 'cut_category_pct', category: c, pct: v });
+  if (w.rentDelta) changes.push({ kind: 'change_rent', amount: w.rentDelta });
+  if (w.incomePct) changes.push({ kind: 'change_income_pct', pct: w.incomePct });
+  for (const [m, v] of Object.entries(w.cancel)) if (v) changes.push({ kind: 'cancel_subscription', merchant: m });
+  const r = simulate(changes); const subs = M.recurring.filter(x => x.kind === 'subscription');
+  const sl = (id, label, val, min, max, step, fmt) => `<div class="slider"><label class="small">${label}</label><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"><b class="small">${fmt(val)}</b></div>`;
+  const ag = RT.lastAgentScenario;
+  return `<h1>What-if planner</h1><p class="sub">Move the sliders, or ask the coach in plain words ("what if my rent goes up by ₹3,000?"). Code does the maths, so answers are exact and repeatable.</p>
+  <div class="grid g2"><div class="card"><h2>Change something</h2>
+   ${Object.keys(w.cuts).map(c => sl('cut_' + c.replace(/\W/g, ''), 'Cut ' + c.toLowerCase(), w.cuts[c], 0, 60, 5, v => v + '%')).join('')}
+   ${sl('rentD', 'Rent change', w.rentDelta, -5000, 10000, 500, v => (v >= 0 ? '+' : '−') + inr(Math.abs(v)))}
+   ${sl('incP', 'Income change', w.incomePct, -30, 40, 5, v => (v >= 0 ? '+' : '') + v + '%')}
+   <div class="small" style="margin-top:8px"><b>Cancel subscriptions:</b> ${subs.map(s => `<label style="margin-right:10px"><input type="checkbox" class="cx" data-m="${esc(s.merchant)}" ${w.cancel[s.merchant] ? 'checked' : ''}> ${esc(title(s.merchant))} (${inr(s.monthly)})</label>`).join('')}</div>
+   <div class="row" style="margin-top:12px"><input type="text" id="wiAsk" placeholder="Or ask: what if I cut dining out by 30%?"><button class="btn p" data-act="wiAsk">Ask agent</button></div></div>
+   <div class="card"><h2>Result</h2>
+   <div class="grid g3">${kpi('Monthly surplus', inr(r.scen.surplus), (r.deltaMonthly >= 0 ? '+' : '') + inr(r.deltaMonthly) + ' vs now')}${kpi('Savings rate', pct(r.scen.rate), 'now ' + pct(r.base.rate))}${kpi('Extra per year', inr(r.deltaYearly), '')}</div>
+   ${chartSavings(r)}
+   <table><tr><th>Goal</th><th>Now reaches</th><th>Then reaches</th></tr>${r.goals.map(g => `<tr><td>${esc(g.name)}</td><td>${g.baseEta ? monthLabel(g.baseEta) : 'never'}</td><td><b>${g.newEta ? monthLabel(g.newEta) : 'never'}</b> ${g.onTrack ? '<span class="pill g">on time</span>' : '<span class="pill w">late</span>'}</td></tr>`).join('')}</table></div></div>
+  ${ag ? `<div class="card"><h2>Last scenario the agent ran</h2><p class="small">${ag.result.applied.map(esc).join(' · ') || 'no changes'}</p><p class="small">Surplus ${inr(ag.result.base.surplus)} → <b>${inr(ag.result.scen.surplus)}</b>/month (${inr(ag.result.deltaYearly)} a year).</p></div>` : ''}`;
+}
+function chartSavings(r) {
+  const W = 520, H = 150, P = 34; const n = 12; const a = [], b = [];
+  for (let i = 0; i <= n; i++) { a.push(Math.max(0, r.base.surplus) * i); b.push(Math.max(0, r.scen.surplus) * i); }
+  const mx = Math.max(1, ...a, ...b); const x = i => P + i * (W - P - 8) / n, y = v => H - 18 - v / mx * (H - 30);
+  const path = arr => arr.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;margin:8px 0" role="img" aria-label="Cumulative savings over 12 months">
+  <line x1="${P}" y1="${H - 18}" x2="${W - 8}" y2="${H - 18}" stroke="#d0d6df"/><text x="${P}" y="12" font-size="10.5" fill="#7b8696">Cumulative savings, next 12 months</text>
+  <path d="${path(a)}" fill="none" stroke="#98a2b3" stroke-width="2" stroke-dasharray="4 4"/><path d="${path(b)}" fill="none" stroke="#127a6d" stroke-width="2.5"/>
+  <text x="${x(n) - 2}" y="${y(b[n]) - 6}" text-anchor="end" font-size="11" font-weight="600" fill="#0f5b52">${inr(b[n])}</text><text x="${x(n) - 2}" y="${y(a[n]) + 14}" text-anchor="end" font-size="10.5" fill="#7b8696">now: ${inr(a[n])}</text>
+  ${[0, 3, 6, 9, 12].map(i => `<text x="${x(i)}" y="${H - 4}" text-anchor="middle" font-size="10" fill="#7b8696">${i}m</text>`).join('')}</svg>`;
+}
+function vReview(M) {
+  if (!S.txns.length) return '<h1>Monthly review</h1>' + emptyState();
+  const k = RT.reviewMonth || M.full[M.full.length - 1] || M.latest; const rv = S.reviews[k];
+  let body = '';
+  if (rv) {
+    let html = esc(rv.text); const bad = (rv.checks || []).filter(c => !c.ok).map(c => c.raw);
+    for (const b of [...new Set(bad)]) html = html.split(esc(b)).join(`<mark class="unv" title="Not found in the computed facts">${esc(b)}</mark>`);
+    const ok = (rv.checks || []).filter(c => c.ok).length, tot = (rv.checks || []).length;
+    body = `<div class="card"><div class="row" style="justify-content:space-between"><h2>${monthLabel(k)} review</h2><span class="pill ${rv.by === 'ai' ? 'i' : 'n'}">${rv.by === 'ai' ? 'written by AI from computed facts' : 'template (AI off)'}</span></div><div class="review">${html}</div>
+    <div class="verify ${bad.length ? 'bad' : 'ok'}">${bad.length ? `Figure check: ${bad.length} of ${tot} figures are not in the computed facts and are highlighted. Treat them with care.` : `Figure check passed: all ${tot} ₹ and % figures match the numbers computed from your transactions.`}</div>
+    <div class="row" style="margin-top:10px"><button class="btn s" data-act="copyReview" data-k="${k}">Copy as text</button></div></div>
+    <div class="card"><h3>Facts the review was built from</h3><table><tr><th>Category</th><th class="n">Spent</th><th class="n">Budget</th><th class="n">Previous month</th></tr>${rv.facts.topCategories.map(c => `<tr><td>${c.category}</td><td class="n">${inr(c.spent)}</td><td class="n">${c.budget ? inr(c.budget) : '–'}</td><td class="n">${c.prevMonth != null ? inr(c.prevMonth) : '–'}</td></tr>`).join('')}</table><p class="small muted">Income ${inr(rv.facts.income)} · spend ${inr(rv.facts.spend)} · saved ${inr(rv.facts.saved)} (${rv.facts.savingsRatePct}%) · invested ${inr(rv.facts.invested)}</p></div>`;
+  }
+  return `<h1>Monthly review</h1><p class="sub">Code computes every number; the AI writes the story; code then checks that each ₹ and % in the story exists in the facts, a simple guard against made-up numbers.</p>
+  <div class="card row"><select id="rvM" style="width:auto">${M.months.map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${monthLabel(x)}${x === M.latest && !M.full.includes(x) ? ' (in progress)' : ''}</option>`).join('')}</select><button class="btn p" data-act="genReview" ${RT.busy ? 'disabled' : ''}>${RT.busy ? '<span class="spin"></span> Working' : rv ? 'Regenerate' : 'Generate review'}</button></div>${body}`;
+}
+function vCoach() {
+  const sug = ['Where did my money go last month?', 'What if I cut dining out and food delivery by 30%?', 'Can I afford the Goa trip on time?', 'Which subscriptions should I drop?', 'Which stock should I buy with my surplus?'];
+  return `<h1>Coach</h1><p class="sub">Ask anything. The agent decides which tools to use, may act on its own (budgets, goals, nudges, rules) and shows every step in the trace. It educates and models scenarios; it never recommends specific securities.</p>
+  <div class="card"><div class="chat" id="chatBox">${S.chat.length ? S.chat.map(m => `<div class="msg ${m.role === 'user' ? 'u' : 'a'} ${m.guard ? 'guard' : ''}" ${m.live ? 'id="liveMsg"' : ''}>${m.guard ? '<span class="pill b">guardrail</span>\n' : ''}${esc(m.content || (m.live ? 'Thinking…' : ''))}</div>`).join('') : '<p class="muted">Try one of the suggestions below.</p>'}</div>
+  <div class="sugg" style="margin:10px 0">${sug.map(s => `<button data-ask="${esc(s)}">${esc(s)}</button>`).join('')}<button data-act="checkup" style="background:var(--brand);color:#fff;border-color:var(--brand)">Run autonomous check-up</button></div>
+  <form class="row" id="chatForm"><input type="text" id="chatIn" placeholder="Ask the coach…" autocomplete="off" style="flex:1"><button class="btn p" ${RT.busy ? 'disabled' : ''}>${RT.busy ? '<span class="spin"></span>' : 'Send'}</button></form></div>`;
+}
+function settingsModal() {
+  $('#modalBox').innerHTML = `<h2>Settings</h2><p class="small">Inside Claude, the AI runs through your Claude account and nothing is needed here. When you run this file on your own (for example from GitHub), add an Anthropic API key. It is stored only in this browser and sent only to api.anthropic.com.</p>
+  <label class="f">Anthropic API key</label><input type="text" id="kIn" value="${esc(lsGet('hisaab_api_key') || '')}" placeholder="sk-ant-…">
+  <label class="f" style="margin-top:8px">Model</label><input type="text" id="mIn" value="${esc(lsGet('hisaab_model') || 'claude-sonnet-5-5')}">
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="closeModal">Close</button><button class="btn p" data-act="saveKey">Save</button></div>`;
+  $('#modal').classList.add('show');
+}
+function confirmModal(text, onYes) {
+  $('#modalBox').innerHTML = `<p>${esc(text)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-act="closeModal">Cancel</button><button class="btn p" id="yesBtn">Yes</button></div>`;
+  $('#modal').classList.add('show'); $('#yesBtn').onclick = () => { $('#modal').classList.remove('show'); onYes(); };
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const tb = e.target.closest('[data-tab]'); if (tb) { RT.tab = tb.dataset.tab; render(); return; }
+  const ask = e.target.closest('[data-ask]'); if (ask) { askCoach(ask.dataset.ask); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return; const act = a.dataset.act;
+  if (act === 'demo') { if (!S.profile.name) S.profile.name = 'Priya'; await runImport('csv', SAMPLE_CSV, 'Demo: HDFC statement CSV, Aug–Oct 2026'); await runImport('sms', SAMPLE_SMS, 'Demo: bank SMS, 1–20 Nov 2026'); RT.tab = 'home'; render(); }
+  else if (act === 'fillSms') { $('#smsIn').value = SAMPLE_SMS; }
+  else if (act === 'importSms') { const v = $('#smsIn').value; if (v.trim()) runImport('sms', v, 'Pasted SMS'); }
+  else if (act === 'importText') { const v = $('#txtIn').value; if (v.trim()) runImport('text', v, 'Pasted statement text'); }
+  else if (act === 'reset') confirmModal('Delete all transactions, rules, goals and chat? This cannot be undone.', () => { S = freshState(); RT.trace = []; RT.pending = null; Store.save(); renderTrace(); render(); toast('All data cleared'); });
+  else if (act === 'dismiss') { S.dismissed[a.dataset.id] = true; Store.save(); render(); }
+  else if (act === 'checkup') runCheckup();
+  else if (act === 'learn') { const pat = ($('#rulePat').value || RT.pending.pattern).toUpperCase().trim(); learnRule(pat, RT.pending.category, 'user'); RT.pending = null; render(); toast('Rule learned'); }
+  else if (act === 'noLearn') { RT.pending = null; render(); }
+  else if (act === 'delRule') { S.rules = S.rules.filter(r => r.id !== a.dataset.id); Store.save(); render(); }
+  else if (act === 'subFlag') { S.subFlags[a.dataset.m] = a.dataset.v; trace('action', `You told the agent ${title(a.dataset.m)} is ${a.dataset.v === 'keep' ? 'in use' : 'not used'}. Cancel list and nudges updated.`); Store.save(); render(); }
+  else if (act === 'addGoal') { const n = $('#gName').value.trim(), t = +$('#gT').value, s = +$('#gS').value || 0, by = $('#gBy').value; if (!n || !t || !by) { toast('Add a name, target and date'); return; } S.profile.goals.push({ id: uid(), name: n, target: t, saved: s, by }); Store.save(); render(); }
+  else if (act === 'delGoal') { S.profile.goals = S.profile.goals.filter(g => g.id !== a.dataset.id); Store.save(); render(); }
+  else if (act === 'wiAsk') { const q = $('#wiAsk').value.trim(); if (q) askCoach(q); }
+  else if (act === 'genReview') generateReview(RT.reviewMonth || model().full[model().full.length - 1] || model().latest);
+  else if (act === 'copyReview') { try { await navigator.clipboard.writeText(S.reviews[a.dataset.k].text); toast('Copied'); } catch { toast('Copy blocked: select the text instead'); } }
+  else if (act === 'letters') writeLetters();
+  else if (act === 'speakBoth') speakFuture('both');
+  else if (act === 'speakOne') speakFuture(a.dataset.v);
+  else if (act === 'stopVoice') { try { RT.tts && RT.tts.stop(); } catch {} }
+  else if (act === 'pickSelf') { RT.futureSelf = a.dataset.v; render(); }
+  else if (act === 'mic') { const d = RT.dict; if (!d) return; if (RT.listening) { d.stop().catch(() => {}); } else { d.start().catch(err => { if (err && err.code === 'not_granted') { RT.dict = null; render(); } }); } }
+  else if (act === 'closeModal') $('#modal').classList.remove('show');
+  else if (act === 'saveKey') { lsSet('hisaab_api_key', $('#kIn').value.trim()); lsSet('hisaab_model', $('#mIn').value.trim() || 'claude-sonnet-5-5'); if (AI.mode !== 'claude') AI.mode = $('#kIn').value.trim() ? 'anthropic' : 'off'; $('#modal').classList.remove('show'); renderChips(); toast('Saved'); }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches('select.cat')) {
+    const tx = S.txns.find(x => x.id === t.dataset.id); if (!tx) return; const from = tx.category;
+    tx.category = t.value; tx.catSource = 'user'; tx.needsReview = false; Store.save();
+    trace('action', `You corrected ${title(tx.merchant)}: ${from} → ${t.value}.`);
+    RT.pending = { id: tx.id, pattern: tx.merchant, category: t.value }; render(); return;
+  }
+  if (t.id === 'fMonth') { RT.filter.month = t.value; render(); }
+  else if (t.id === 'fCat') { RT.filter.cat = t.value; render(); }
+  else if (t.id === 'fRev') { RT.filter.review = t.checked; render(); }
+  else if (t.id === 'rvM') { RT.reviewMonth = t.value; render(); }
+  else if (t.id === 'incOv') { S.profile.incomeOverride = +t.value || null; Store.save(); render(); }
+  else if (t.id === 'efIn') { S.profile.emergencyFund = +t.value || 0; Store.save(); render(); }
+  else if (t.id === 'efM') { S.profile.emergencyMonths = Math.max(1, +t.value || 6); Store.save(); render(); }
+  else if (t.classList.contains('bud')) { S.profile.budgets[t.dataset.c] = +t.value || 0; Store.save(); render(); }
+  else if (t.classList.contains('cx')) { RT.whatif.cancel[t.dataset.m] = t.checked; render(); }
+  else if (t.type === 'range') {
+    const id = t.id, v = +t.value;
+    if (id === 'rentD') RT.whatif.rentDelta = v; else if (id === 'incP') RT.whatif.incomePct = v;
+    else for (const c of Object.keys(RT.whatif.cuts)) if ('cut_' + c.replace(/\W/g, '') === id) RT.whatif.cuts[c] = v;
+    render();
+  }
+  else if (t.id === 'file') handleFile(t.files[0]);
+  else if (t.id === 'fuName') { S.profile.name = t.value.trim(); Store.save(); render(); }
+  else if (t.id === 'fuAge') { S.profile.age = Math.max(16, Math.min(80, +t.value || 27)); Store.save(); render(); }
+  else if (t.id === 'autoVoice') { RT.autoVoice = t.checked; }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'fQ') { RT.filter.q = t.value; clearTimeout(RT._q); RT._q = setTimeout(() => { render(); const q = $('#fQ'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }, 300); }
+  else if (t.type === 'range') {
+    const v = +t.value; const lab = t.nextElementSibling;
+    if (lab) lab.textContent = t.id === 'rentD' ? (v >= 0 ? '+' : '−') + inr(Math.abs(v)) : t.id === 'incP' ? (v >= 0 ? '+' : '') + v + '%' : v + '%';
+  }
+});
+document.addEventListener('submit', e => { if (e.target.id === 'chatForm') { e.preventDefault(); const v = $('#chatIn').value; $('#chatIn').value = ''; askCoach(v); } if (e.target.id === 'futForm') { e.preventDefault(); const v = $('#fuIn').value; $('#fuIn').value = ''; askFuture(v); } });
+document.addEventListener('dragover', e => { const d = e.target.closest && e.target.closest('#drop'); if (d) { e.preventDefault(); d.classList.add('over'); } });
+document.addEventListener('dragleave', e => { const d = e.target.closest && e.target.closest('#drop'); if (d) d.classList.remove('over'); });
+document.addEventListener('drop', e => { const d = e.target.closest && e.target.closest('#drop'); if (d) { e.preventDefault(); d.classList.remove('over'); handleFile(e.dataTransfer.files[0]); } });
+async function handleFile(f) {
+  if (!f) return;
+  if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf') runImport('pdf', new Uint8Array(await f.arrayBuffer()), 'PDF: ' + f.name);
+  else runImport('csv', await f.text(), 'File: ' + f.name);
+}
+$('#settingsBtn').onclick = settingsModal;
+$('#clearTrace').onclick = () => { RT.trace = []; renderTrace(); };
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('show'); });
+
+/* ---------- boot ---------- */
+(async function boot() {
+  render(); renderTrace();
+  await Store.init(); RT.ver++; render(); renderChips();
+  AI.init();
+  if (window.claude && typeof window.claude.use === 'function') {
+    withTimeout(window.claude.use('tts'), 10000).then(t => { if (t) { RT.tts = t; render(); } }).catch(() => {});
+    withTimeout(window.claude.use('dictation'), 10000).then(d => { if (!d) return; RT.dict = d;
+      d.onFinal(({ text }) => { const el = $('#fuIn'); if (el) el.value = (el.value + ' ' + text).trim(); });
+      d.onState(({ state }) => { RT.listening = state === 'listening'; const b = $('#micBtn'); if (b) b.textContent = RT.listening ? 'Stop' : 'Speak'; });
+      render(); }).catch(() => {});
+  }
+  if (S.txns.length) trace('info', `Loaded your saved money model: ${S.txns.length} transactions, ${S.rules.length} learned rule(s).`);
+})();
+</script>
+</body>
+</html>
