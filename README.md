@@ -2,7 +2,7 @@
 
 *Product Space Agentic AI Hackathon '26, problem statement 04: "Personal finance coach with a living money model".*
 
-**Try it, no login:** https://ananya2104.github.io/hisaab/ (click **Watch a recorded AI session**) · **Live AI version:** https://claude.ai/artifact/4ctbhB5aCAENGaH8LZbTPA (needs a Claude login) · **Demo video:** [add your video link here]
+**Try it, no login:** https://ananya2104.github.io/hisaab/ (click **Watch a recorded AI session**) · **Live AI version:** https://claude.ai/artifact/4ctbhB5aCAENGaH8LZbTPA (needs a Claude login) · **Demo video (2:52):** https://drive.google.com/file/d/1rdKRFNpPgAat8s6QZ-8d92mszUoFzWIC/view?usp=sharing
 
 Most budgeting apps sort transactions into categories and stop there. Hisaab keeps a *living* model of your money. It reads messy Indian bank data (statement CSVs, PDFs, bank SMS), learns from every correction you make, spots subscriptions and price hikes, plans goals with what-if scenarios, nudges you when spending drifts, and writes a monthly review. An AI agent sits on top. It decides which tools to use, takes low-risk actions on its own, and shows every step in a live trace. It educates and models scenarios. It never recommends specific securities.
 
